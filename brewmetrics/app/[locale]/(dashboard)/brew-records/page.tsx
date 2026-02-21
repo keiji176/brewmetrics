@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -75,6 +75,7 @@ export default function BrewRecordsPage() {
   const [editing, setEditing] = useState<BrewRecord | null>(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<BrewRecordForm>(emptyForm);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const supabase = createClient();
 
@@ -198,6 +199,50 @@ export default function BrewRecordsPage() {
     if (deleteError) setError(deleteError.message);
     else setRecords((prev) => prev.filter((record) => record.id !== id));
   }
+
+  const stats = useMemo(() => {
+    const totalBrews = records.length;
+
+    const scores = records
+      .map((record) => record.score)
+      .filter((score): score is number => score != null);
+    const avgScore =
+      scores.length > 0
+        ? (scores.reduce((sum, score) => sum + score, 0) / scores.length).toFixed(1)
+        : null;
+
+    const beanCountMap = new Map<string, number>();
+    records.forEach((record) => {
+      const beanName = record.bean_name?.trim();
+      if (!beanName) return;
+      beanCountMap.set(beanName, (beanCountMap.get(beanName) ?? 0) + 1);
+    });
+
+    let favoriteBean: string | null = null;
+    let maxCount = 0;
+    beanCountMap.forEach((count, beanName) => {
+      if (count > maxCount) {
+        favoriteBean = beanName;
+        maxCount = count;
+      }
+    });
+
+    return {
+      totalBrews,
+      avgScore,
+      favoriteBean,
+    };
+  }, [records]);
+
+  const filteredRecords = useMemo(() => {
+    const keyword = searchQuery.trim().toLowerCase();
+    if (!keyword) return records;
+    return records.filter((record) => {
+      const beanName = record.bean_name?.toLowerCase() ?? "";
+      const notes = record.notes?.toLowerCase() ?? "";
+      return beanName.includes(keyword) || notes.includes(keyword);
+    });
+  }, [records, searchQuery]);
 
   return (
     <div className="space-y-8">
@@ -384,6 +429,39 @@ export default function BrewRecordsPage() {
         </DialogContent>
       </Dialog>
 
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>{t("statsTotalBrews")}</CardDescription>
+            <CardTitle className="text-2xl tabular-nums">{stats.totalBrews}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>{t("statsAvgScore")}</CardDescription>
+            <CardTitle className="text-2xl tabular-nums">
+              {stats.avgScore ?? "-"}
+            </CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>{t("statsFavoriteBean")}</CardDescription>
+            <CardTitle className="line-clamp-1 text-lg">
+              {stats.favoriteBean ?? t("statsNoFavoriteBean")}
+            </CardTitle>
+          </CardHeader>
+        </Card>
+      </div>
+
+      <div className="max-w-md">
+        <Input
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder={t("searchPlaceholder")}
+        />
+      </div>
+
       {error && (
         <Card className="border-rose-200 bg-rose-50/50">
           <CardContent className="py-4">
@@ -410,9 +488,15 @@ export default function BrewRecordsPage() {
             </Button>
           </CardContent>
         </Card>
+      ) : filteredRecords.length === 0 ? (
+        <Card>
+          <CardContent className="py-10 text-sm text-[var(--muted-foreground)]">
+            {t("noSearchResults")}
+          </CardContent>
+        </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {records.map((record) => (
+          {filteredRecords.map((record) => (
             <Card key={record.id} className="overflow-hidden">
               <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
                 <div className="space-y-1">
