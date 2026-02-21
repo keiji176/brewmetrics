@@ -55,3 +55,5 @@ Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Vercel env
 ## Design
 
 Coffee palette (brown, cream, dark gray). Responsive layout with sidebar and mobile menu. Stripe/Linear/Vercel-style UI.
+
+
