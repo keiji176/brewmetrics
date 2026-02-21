@@ -9,9 +9,16 @@ import { cn } from "@/lib/utils";
 interface GlossaryCardProps {
   term: GlossaryTerm;
   index: number;
+  quickTipLabel: string;
+  toggleTipLabel: string;
 }
 
-export function GlossaryCard({ term, index }: GlossaryCardProps) {
+export function GlossaryCard({
+  term,
+  index,
+  quickTipLabel,
+  toggleTipLabel,
+}: GlossaryCardProps) {
   const [showTip, setShowTip] = useState(false);
 
   return (
@@ -32,8 +39,8 @@ export function GlossaryCard({ term, index }: GlossaryCardProps) {
               type="button"
               onClick={() => setShowTip(!showTip)}
               className="rounded-full p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--primary)]"
-              aria-label="Toggle tip"
-              title="Quick tip"
+              aria-label={toggleTipLabel}
+              title={quickTipLabel}
             >
               <Info className="h-4 w-4" />
             </button>
@@ -47,7 +54,7 @@ export function GlossaryCard({ term, index }: GlossaryCardProps) {
         </p>
         {term.tip && showTip && (
           <div className="rounded-lg border border-[var(--border)] bg-[var(--cream-muted)] px-3 py-2">
-            <p className="text-xs font-medium text-[var(--primary)]">Quick tip</p>
+            <p className="text-xs font-medium text-[var(--primary)]">{quickTipLabel}</p>
             <p className="text-sm text-[var(--foreground)]">{term.tip}</p>
           </div>
         )}

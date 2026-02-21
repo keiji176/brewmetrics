@@ -30,9 +30,11 @@ type BrewRecord = {
   bean_name: string | null;
   roaster: string | null;
   grind_size: string | null;
-  water_temperature: number | null;
-  brew_method: string | null;
-  cupping_score: number | null;
+  temperature: number | null;
+  coffee_weight: number | null;
+  water_weight: number | null;
+  brew_time: number | null;
+  score: number | null;
   notes: string | null;
   created_at: string;
 };
@@ -41,9 +43,11 @@ type BrewRecordForm = {
   bean_name: string;
   roaster: string;
   grind_size: string;
-  water_temperature: number | null;
-  brew_method: string;
-  cupping_score: number | null;
+  temperature: number | null;
+  coffee_weight: number | null;
+  water_weight: number | null;
+  brew_time: number | null;
+  score: number | null;
   notes: string;
 };
 
@@ -51,9 +55,11 @@ const emptyForm: BrewRecordForm = {
   bean_name: "",
   roaster: "",
   grind_size: "",
-  water_temperature: null,
-  brew_method: "",
-  cupping_score: null,
+  temperature: null,
+  coffee_weight: null,
+  water_weight: null,
+  brew_time: null,
+  score: null,
   notes: "",
 };
 
@@ -118,9 +124,11 @@ export default function BrewRecordsPage() {
       bean_name: record.bean_name ?? "",
       roaster: record.roaster ?? "",
       grind_size: record.grind_size ?? "",
-      water_temperature: record.water_temperature,
-      brew_method: record.brew_method ?? "",
-      cupping_score: record.cupping_score,
+      temperature: record.temperature,
+      coffee_weight: record.coffee_weight,
+      water_weight: record.water_weight,
+      brew_time: record.brew_time,
+      score: record.score,
       notes: record.notes ?? "",
     });
     setDialogOpen(true);
@@ -136,10 +144,11 @@ export default function BrewRecordsPage() {
       bean_name: form.bean_name || null,
       roaster: form.roaster || null,
       grind_size: form.grind_size || null,
-      water_temperature:
-        form.water_temperature != null ? Number(form.water_temperature) : null,
-      brew_method: form.brew_method || null,
-      cupping_score: form.cupping_score != null ? Number(form.cupping_score) : null,
+      temperature: form.temperature != null ? Number(form.temperature) : null,
+      coffee_weight: form.coffee_weight != null ? Number(form.coffee_weight) : null,
+      water_weight: form.water_weight != null ? Number(form.water_weight) : null,
+      brew_time: form.brew_time != null ? Number(form.brew_time) : null,
+      score: form.score != null ? Number(form.score) : null,
       notes: form.notes || null,
     };
 
@@ -250,33 +259,75 @@ export default function BrewRecordsPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="water_temperature">{t("waterTemperature")}</Label>
+                  <Label htmlFor="temperature">{t("temperature")}</Label>
                   <Input
-                    id="water_temperature"
+                    id="temperature"
                     type="number"
                     min={70}
                     max={100}
-                    value={form.water_temperature ?? ""}
+                    value={form.temperature ?? ""}
                     onChange={(e) =>
                       setForm((current) => ({
                         ...current,
-                        water_temperature: e.target.value ? Number(e.target.value) : null,
+                        temperature: e.target.value ? Number(e.target.value) : null,
                       }))
                     }
-                    placeholder={t("waterTemperaturePlaceholder")}
+                    placeholder={t("temperaturePlaceholder")}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="coffee_weight">{t("coffeeWeight")}</Label>
+                  <Input
+                    id="coffee_weight"
+                    type="number"
+                    min={0}
+                    step={0.1}
+                    value={form.coffee_weight ?? ""}
+                    onChange={(e) =>
+                      setForm((current) => ({
+                        ...current,
+                        coffee_weight: e.target.value ? Number(e.target.value) : null,
+                      }))
+                    }
+                    placeholder={t("coffeeWeightPlaceholder")}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="water_weight">{t("waterWeight")}</Label>
+                  <Input
+                    id="water_weight"
+                    type="number"
+                    min={0}
+                    step={1}
+                    value={form.water_weight ?? ""}
+                    onChange={(e) =>
+                      setForm((current) => ({
+                        ...current,
+                        water_weight: e.target.value ? Number(e.target.value) : null,
+                      }))
+                    }
+                    placeholder={t("waterWeightPlaceholder")}
                   />
                 </div>
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="brew_method">{t("brewMethod")}</Label>
+                <Label htmlFor="brew_time">{t("brewTime")}</Label>
                 <Input
-                  id="brew_method"
-                  value={form.brew_method}
+                  id="brew_time"
+                  type="number"
+                  min={0}
+                  value={form.brew_time ?? ""}
                   onChange={(e) =>
-                    setForm((current) => ({ ...current, brew_method: e.target.value }))
+                    setForm((current) => ({
+                      ...current,
+                      brew_time: e.target.value ? Number(e.target.value) : null,
+                    }))
                   }
-                  placeholder={t("brewMethodPlaceholder")}
+                  placeholder={t("brewTimePlaceholder")}
                 />
               </div>
 
@@ -288,11 +339,11 @@ export default function BrewRecordsPage() {
                   min={0}
                   max={100}
                   step={0.5}
-                  value={form.cupping_score ?? ""}
+                  value={form.score ?? ""}
                   onChange={(e) =>
                     setForm((current) => ({
                       ...current,
-                      cupping_score: e.target.value ? Number(e.target.value) : null,
+                      score: e.target.value ? Number(e.target.value) : null,
                     }))
                   }
                   placeholder={t("scorePlaceholder")}
@@ -397,19 +448,29 @@ export default function BrewRecordsPage() {
                     {t("grind")} : {record.grind_size}
                   </p>
                 )}
-                {record.water_temperature != null && (
+                {record.temperature != null && (
                   <p className="text-[var(--muted-foreground)]">
-                    {t("waterTemp")} : {record.water_temperature}°C
+                    {t("temperatureShort")} : {record.temperature}°C
                   </p>
                 )}
-                {record.brew_method && (
+                {record.coffee_weight != null && (
                   <p className="text-[var(--muted-foreground)]">
-                    {t("brewMethodShort")} : {record.brew_method}
+                    {t("coffeeWeightShort")} : {record.coffee_weight}g
                   </p>
                 )}
-                {record.cupping_score != null && (
+                {record.water_weight != null && (
+                  <p className="text-[var(--muted-foreground)]">
+                    {t("waterWeightShort")} : {record.water_weight}g
+                  </p>
+                )}
+                {record.brew_time != null && (
+                  <p className="text-[var(--muted-foreground)]">
+                    {t("brewTimeShort")} : {record.brew_time}s
+                  </p>
+                )}
+                {record.score != null && (
                   <p className="font-medium text-[var(--primary)]">
-                    {t("score")} : {record.cupping_score}
+                    {t("score")} : {record.score}
                   </p>
                 )}
                 {record.notes && (

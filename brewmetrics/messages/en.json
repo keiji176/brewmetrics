@@ -104,11 +104,15 @@
     "roasterPlaceholder": "e.g. Onibus Coffee",
     "grindSize": "Grind size",
     "grindSizePlaceholder": "e.g. medium-fine",
-    "waterTemperature": "Water temperature (°C)",
-    "waterTemperaturePlaceholder": "92",
-    "brewMethod": "Brewing gear / method",
-    "brewMethodPlaceholder": "e.g. V60, AeroPress, French Press",
-    "scoreOrImpression": "Cupping score (optional)",
+    "temperature": "Water temperature (°C)",
+    "temperaturePlaceholder": "92",
+    "coffeeWeight": "Coffee dose (g)",
+    "coffeeWeightPlaceholder": "15",
+    "waterWeight": "Water weight (g)",
+    "waterWeightPlaceholder": "240",
+    "brewTime": "Brew time (s)",
+    "brewTimePlaceholder": "165",
+    "scoreOrImpression": "Score (optional)",
     "scorePlaceholder": "85",
     "notes": "Impression / notes",
     "notesPlaceholder": "Flavor notes, bloom behavior, sweetness, body...",
@@ -118,8 +122,10 @@
     "deleteConfirm": "Delete this brew record?",
     "unnamed": "Unnamed bean",
     "grind": "Grind",
-    "waterTemp": "Water",
-    "brewMethodShort": "Method",
+    "temperatureShort": "Temp",
+    "coffeeWeightShort": "Coffee",
+    "waterWeightShort": "Water",
+    "brewTimeShort": "Time",
     "score": "Score"
   },
   "digitalTwin": {
@@ -145,7 +151,71 @@
     "title": "Coffee Glossary",
     "description": "Learn common coffee terms to brew with confidence",
     "searchPlaceholder": "Search terms (e.g. acidity, bloom, extraction)",
-    "noResults": "No matching terms were found. Try another keyword."
+    "noResults": "No matching terms were found. Try another keyword.",
+    "quickTip": "Quick tip",
+    "toggleTip": "Toggle tip",
+    "terms": {
+      "acidity": {
+        "term": "Acidity",
+        "short": "A bright, lively sensation often similar to citrus or apple.",
+        "explanation": "In coffee, acidity means pleasant brightness, not harsh sourness. Good acidity makes flavor feel clear and juicy. It is often more noticeable in light roasts and some origins such as Ethiopia or Kenya.",
+        "tip": "If acidity feels too sharp, try a slightly finer grind or hotter water."
+      },
+      "body": {
+        "term": "Body",
+        "short": "The weight and texture of coffee in your mouth.",
+        "explanation": "Body describes mouthfeel: light and tea-like, smooth and medium, or heavy and syrupy. It is different from strength or caffeine. Brewing method and roast level strongly affect body.",
+        "tip": "French press usually gives fuller body than paper-filter pour-over."
+      },
+      "bloom": {
+        "term": "Bloom",
+        "short": "The bubbling phase right after first pour in manual brewing.",
+        "explanation": "When hot water first touches fresh grounds, trapped CO₂ escapes and creates bubbles. This stage is called bloom. A short bloom period can improve even extraction in pour-over brewing.",
+        "tip": "Try 30–45 seconds bloom before continuing your main pours."
+      },
+      "brewRatio": {
+        "term": "Brew Ratio",
+        "short": "The relationship between coffee dose and water amount.",
+        "explanation": "Brew ratio is usually written like 1:15 or 1:16, meaning 1g coffee for 15–16g water. It is one of the easiest ways to tune cup strength and balance.",
+        "tip": "A common starting point for pour-over is around 1:15 to 1:16."
+      },
+      "cupping": {
+        "term": "Cupping",
+        "short": "A standardized method to taste and compare coffee.",
+        "explanation": "Cupping is a professional tasting protocol used to evaluate aroma, flavor, acidity, body, and aftertaste. It helps compare lots consistently and communicate quality objectively.",
+        "tip": "Think of cupping as a shared language for coffee quality."
+      },
+      "extraction": {
+        "term": "Extraction",
+        "short": "How much flavor is dissolved from grounds into water.",
+        "explanation": "Extraction is controlled by grind size, temperature, brew time, and agitation. Under-extraction often tastes sour and thin, while over-extraction can taste bitter and dry.",
+        "tip": "Change one variable at a time when dialing in."
+      },
+      "extractionYield": {
+        "term": "Extraction Yield",
+        "short": "The percentage of coffee mass dissolved into the cup.",
+        "explanation": "Extraction yield estimates how much soluble material moved from grounds to beverage. For filter coffee, many brewers target roughly 18–22% for balanced flavor.",
+        "tip": "If cups are consistently harsh, your extraction may be too high."
+      },
+      "grindSize": {
+        "term": "Grind Size",
+        "short": "How coarse or fine your ground coffee is.",
+        "explanation": "Finer grounds extract faster because they have more surface area. Coarser grounds extract slower. Matching grind size to brew method is key for repeatable results.",
+        "tip": "Pour-over often starts around medium to medium-fine."
+      },
+      "tds": {
+        "term": "TDS",
+        "short": "Total Dissolved Solids: concentration of dissolved coffee in the drink.",
+        "explanation": "TDS indicates how strong your brewed coffee is, often measured by refractometer. Higher TDS usually means stronger concentration, while lower TDS tastes lighter.",
+        "tip": "TDS shows strength, not necessarily quality by itself."
+      },
+      "underOver": {
+        "term": "Under / Over Extraction",
+        "short": "Two common extraction imbalance patterns in brewing.",
+        "explanation": "Under-extracted cups can taste sour, salty, or watery. Over-extracted cups can taste bitter, harsh, or drying. Adjusting grind, time, and temperature helps rebalance.",
+        "tip": "Sour-thin often needs more extraction; bitter-dry often needs less."
+      }
+    }
   },
   "settings": {
     "title": "Settings",

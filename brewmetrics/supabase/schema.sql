@@ -88,3 +88,44 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+-- Brew records — home barista extraction journal
+create table if not exists public.brew_records (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users (id) on delete cascade not null,
+  bean_name text,
+  roaster text,
+  grind_size text,
+  temperature numeric,
+  coffee_weight numeric,
+  water_weight numeric,
+  brew_time numeric,
+  score numeric,
+  notes text,
+  created_at timestamptz default now() not null
+);
+
+alter table public.brew_records enable row level security;
+
+drop policy if exists "Users can read own brew_records" on public.brew_records;
+create policy "Users can read own brew_records"
+  on public.brew_records for select
+  using (auth.uid() = user_id);
+
+drop policy if exists "Users can insert own brew_records" on public.brew_records;
+create policy "Users can insert own brew_records"
+  on public.brew_records for insert
+  with check (auth.uid() = user_id);
+
+drop policy if exists "Users can update own brew_records" on public.brew_records;
+create policy "Users can update own brew_records"
+  on public.brew_records for update
+  using (auth.uid() = user_id);
+
+drop policy if exists "Users can delete own brew_records" on public.brew_records;
+create policy "Users can delete own brew_records"
+  on public.brew_records for delete
+  using (auth.uid() = user_id);
+
+create index if not exists brew_records_user_id_created_at_idx
+  on public.brew_records (user_id, created_at desc);

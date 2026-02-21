@@ -3,21 +3,53 @@
 import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { GlossaryCard } from "@/components/glossary/GlossaryCard";
-import { glossaryTerms } from "@/lib/glossary-data";
 import { useTranslations } from "next-intl";
+
+const termIds = [
+  "acidity",
+  "body",
+  "bloom",
+  "brewRatio",
+  "cupping",
+  "extraction",
+  "extractionYield",
+  "grindSize",
+  "tds",
+  "underOver",
+] as const;
+
+type GlossaryEntry = {
+  id: string;
+  term: string;
+  short: string;
+  explanation: string;
+  tip: string;
+};
 
 export default function GlossaryPage() {
   const t = useTranslations("glossary");
   const [query, setQuery] = useState("");
 
+  const terms = useMemo<GlossaryEntry[]>(
+    () =>
+      termIds.map((id) => ({
+        id,
+        term: t(`terms.${id}.term`),
+        short: t(`terms.${id}.short`),
+        explanation: t(`terms.${id}.explanation`),
+        tip: t(`terms.${id}.tip`),
+      })),
+    [t]
+  );
+
   const filtered = useMemo(() => {
     const keyword = query.trim().toLowerCase();
-    if (!keyword) return glossaryTerms;
-    return glossaryTerms.filter((term) => {
+    if (!keyword) return terms;
+    return terms.filter((term) => {
       const plain = `${term.term} ${term.short} ${term.explanation}`.toLowerCase();
       return plain.includes(keyword);
     });
-  }, [query]);
+  }, [query, terms]);
 
   return (
     <div className="space-y-8">
@@ -42,7 +74,13 @@ export default function GlossaryPage() {
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
           {filtered.map((term, index) => (
-            <GlossaryCard key={term.id} term={term} index={index} />
+            <GlossaryCard
+              key={term.id}
+              term={term}
+              index={index}
+              quickTipLabel={t("quickTip")}
+              toggleTipLabel={t("toggleTip")}
+            />
           ))}
         </div>
       )}
