@@ -2,10 +2,12 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+const LOCALES = ["en", "ja"] as const;
+
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/";
+  let next = searchParams.get("next") ?? "/";
 
   if (code) {
     const cookieStore = await cookies();
@@ -25,11 +27,22 @@ export async function GET(request: Request) {
         },
       }
     );
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
+    const { data: { user }, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error && user) {
+      const hasLocale = LOCALES.some((l) => next === `/${l}` || next.startsWith(`/${l}/`));
+      if (!hasLocale) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("language")
+          .eq("id", user.id)
+          .single();
+        const locale = profile?.language === "ja" ? "ja" : "en";
+        next = next === "/" ? `/${locale}` : `/${locale}${next}`;
+      }
       return NextResponse.redirect(`${origin}${next}`);
     }
   }
 
-  return NextResponse.redirect(`${origin}/login?error=auth`);
+  const locale = "en";
+  return NextResponse.redirect(`${origin}/${locale}/login?error=auth`);
 }

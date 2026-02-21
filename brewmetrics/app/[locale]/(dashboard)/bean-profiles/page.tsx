@@ -22,6 +22,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Coffee, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const emptyRecord = (userId: string): Omit<RoastingRecordRow, "id" | "created_at"> => ({
   user_id: userId,
@@ -34,6 +35,8 @@ const emptyRecord = (userId: string): Omit<RoastingRecordRow, "id" | "created_at
 });
 
 export default function BeanProfilesPage() {
+  const t = useTranslations("beanProfiles");
+  const tCommon = useTranslations("common");
   const [records, setRecords] = useState<RoastingRecordRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -139,7 +142,7 @@ export default function BeanProfilesPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!supabase || !confirm("Delete this roasting record?")) return;
+    if (!supabase || !confirm(t("deleteConfirm"))) return;
     const { error: e } = await supabase.from("roasting_records").delete().eq("id", id);
     if (e) setError(e.message);
     else setRecords((prev) => prev.filter((r) => r.id !== id));
@@ -150,36 +153,34 @@ export default function BeanProfilesPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-[var(--gray-dark)]">
-            Bean Profiles
+            {t("title")}
           </h1>
-          <p className="mt-1 text-sm text-[var(--muted-foreground)]">
-            Create, edit, and manage your roasting records
-          </p>
+          <p className="mt-1 text-sm text-[var(--muted-foreground)]">{t("description")}</p>
         </div>
         <Button onClick={openCreate} className="gap-2" disabled={!userId}>
-            <Plus className="h-4 w-4" />
-            Add record
-          </Button>
+          <Plus className="h-4 w-4" />
+          {t("addRecord")}
+        </Button>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{editing ? "Edit record" : "New roasting record"}</DialogTitle>
-              <DialogDescription>Fields are optional.</DialogDescription>
+              <DialogTitle>{editing ? t("editRecord") : t("newRecord")}</DialogTitle>
+              <DialogDescription>{t("fieldsOptional")}</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="bean_name">Bean name</Label>
+                  <Label htmlFor="bean_name">{t("beanName")}</Label>
                   <Input
                     id="bean_name"
                     value={form.bean_name ?? ""}
                     onChange={(e) => setForm((f) => ({ ...f, bean_name: e.target.value }))}
-                    placeholder="e.g. Ethiopia Yirgacheffe"
+                    placeholder={t("beanNamePlaceholder")}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="roast_temperature">Roast temp (°C)</Label>
+                    <Label htmlFor="roast_temperature">{t("roastTemp")}</Label>
                     <Input
                       id="roast_temperature"
                       type="number"
@@ -192,11 +193,11 @@ export default function BeanProfilesPage() {
                           roast_temperature: e.target.value ? Number(e.target.value) : null,
                         }))
                       }
-                      placeholder="205"
+                      placeholder={t("roastTempPlaceholder")}
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="roast_time">Roast time (min)</Label>
+                    <Label htmlFor="roast_time">{t("roastTime")}</Label>
                     <Input
                       id="roast_time"
                       type="number"
@@ -209,22 +210,22 @@ export default function BeanProfilesPage() {
                           roast_time: e.target.value ? Number(e.target.value) : null,
                         }))
                       }
-                      placeholder="10"
+                      placeholder={t("roastTimePlaceholder")}
                     />
                   </div>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="grind_size">Grind size</Label>
+                  <Label htmlFor="grind_size">{t("grindSize")}</Label>
                   <Input
                     id="grind_size"
                     value={form.grind_size ?? ""}
                     onChange={(e) => setForm((f) => ({ ...f, grind_size: e.target.value }))}
-                    placeholder="e.g. medium-fine"
+                    placeholder={t("grindSizePlaceholder")}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="extraction_time">Extraction time (s)</Label>
+                    <Label htmlFor="extraction_time">{t("extractionTime")}</Label>
                     <Input
                       id="extraction_time"
                       type="number"
@@ -236,11 +237,11 @@ export default function BeanProfilesPage() {
                           extraction_time: e.target.value ? Number(e.target.value) : null,
                         }))
                       }
-                      placeholder="28"
+                      placeholder={t("extractionTimePlaceholder")}
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="cupping_score">Cupping score</Label>
+                    <Label htmlFor="cupping_score">{t("cuppingScore")}</Label>
                     <Input
                       id="cupping_score"
                       type="number"
@@ -254,25 +255,25 @@ export default function BeanProfilesPage() {
                           cupping_score: e.target.value ? Number(e.target.value) : null,
                         }))
                       }
-                      placeholder="85"
+                      placeholder={t("cuppingScorePlaceholder")}
                     />
                   </div>
                 </div>
               </div>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                  Cancel
+                  {tCommon("cancel")}
                 </Button>
                 <Button type="submit" disabled={saving}>
                   {saving ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Saving…
+                      {t("saving")}
                     </>
                   ) : editing ? (
-                    "Save"
+                    tCommon("save")
                   ) : (
-                    "Create"
+                    tCommon("create")
                   )}
                 </Button>
               </DialogFooter>
@@ -299,13 +300,11 @@ export default function BeanProfilesPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
             <Coffee className="h-12 w-12 text-[var(--muted-foreground)]" />
-            <p className="mt-4 font-medium text-[var(--foreground)]">No roasting records yet</p>
-            <p className="mt-1 text-sm text-[var(--muted-foreground)]">
-              Add your first record to start tracking quality.
-            </p>
+            <p className="mt-4 font-medium text-[var(--foreground)]">{t("noRecords")}</p>
+            <p className="mt-1 text-sm text-[var(--muted-foreground)]">{t("noRecordsHint")}</p>
             <Button className="mt-4 gap-2" onClick={openCreate}>
               <Plus className="h-4 w-4" />
-              Add record
+              {t("addRecord")}
             </Button>
           </CardContent>
         </Card>
@@ -315,7 +314,7 @@ export default function BeanProfilesPage() {
             <Card key={record.id} className="overflow-hidden">
               <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
                 <CardTitle className="text-base font-medium text-[var(--gray-dark)]">
-                  {record.bean_name || "Unnamed"}
+                  {record.bean_name || t("unnamed")}
                 </CardTitle>
                 <div className="flex gap-1">
                   <Button
@@ -339,23 +338,23 @@ export default function BeanProfilesPage() {
               <CardContent className="space-y-1 text-sm">
                 {record.roast_temperature != null && (
                   <p className="text-[var(--muted-foreground)]">
-                    Temp: {record.roast_temperature}°C
+                    {t("temp")}: {record.roast_temperature}°C
                   </p>
                 )}
                 {record.roast_time != null && (
-                  <p className="text-[var(--muted-foreground)]">Time: {record.roast_time} min</p>
+                  <p className="text-[var(--muted-foreground)]">{t("time")}: {record.roast_time} min</p>
                 )}
                 {record.grind_size && (
-                  <p className="text-[var(--muted-foreground)]">Grind: {record.grind_size}</p>
+                  <p className="text-[var(--muted-foreground)]">{t("grind")}: {record.grind_size}</p>
                 )}
                 {record.extraction_time != null && (
                   <p className="text-[var(--muted-foreground)]">
-                    Extraction: {record.extraction_time}s
+                    {t("extraction")}: {record.extraction_time}s
                   </p>
                 )}
                 {record.cupping_score != null && (
                   <p className="font-medium text-[var(--primary)]">
-                    Cupping: {record.cupping_score}
+                    {t("cupping")}: {record.cupping_score}
                   </p>
                 )}
                 <p className="text-xs text-[var(--muted-foreground)]">

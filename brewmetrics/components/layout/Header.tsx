@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "@/i18n/routing";
+import { useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { ChevronDown, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +18,11 @@ import type { User as AuthUser } from "@supabase/supabase-js";
 
 export function Header() {
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = useLocale();
+  const t = useTranslations("common");
   const [user, setUser] = useState<AuthUser | null>(null);
+  const currentPath = pathname || "/";
 
   useEffect(() => {
     const supabase = createClient();
@@ -35,12 +41,53 @@ export function Header() {
     router.refresh();
   }
 
+  async function handleLocaleChange(newLocale: "en" | "ja") {
+    if (locale === newLocale) return;
+    const supabase = createClient();
+    if (supabase && user) {
+      await supabase.from("profiles").update({ language: newLocale }).eq("id", user.id);
+    }
+    router.replace(currentPath, { locale: newLocale });
+    router.refresh();
+  }
+
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[var(--border)] bg-[var(--card)]/80 px-4 backdrop-blur-sm sm:px-6">
       <div className="flex items-center gap-2 sm:gap-4">
         <MobileNav />
       </div>
       <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 rounded-lg border border-[var(--border)] bg-[var(--muted)]/50 px-1 py-0.5">
+          <a
+            href={`/en${currentPath === "/" ? "" : currentPath}`}
+            onClick={(e) => {
+              e.preventDefault();
+              handleLocaleChange("en");
+            }}
+            className={`rounded px-2 py-1 text-sm font-medium transition-colors ${
+              locale === "en"
+                ? "bg-[var(--card)] text-[var(--primary)] shadow-sm"
+                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+            }`}
+          >
+            EN
+          </a>
+          <span className="text-[var(--border)]">|</span>
+          <a
+            href={`/ja${currentPath === "/" ? "" : currentPath}`}
+            onClick={(e) => {
+              e.preventDefault();
+              handleLocaleChange("ja");
+            }}
+            className={`rounded px-2 py-1 text-sm font-medium transition-colors ${
+              locale === "ja"
+                ? "bg-[var(--card)] text-[var(--primary)] shadow-sm"
+                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+            }`}
+          >
+            日本語
+          </a>
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="gap-2">
@@ -48,7 +95,7 @@ export function Header() {
                 <User className="h-4 w-4 text-[var(--primary)]" />
               </div>
               <span className="hidden max-w-[120px] truncate text-[var(--foreground)] sm:inline-block">
-                {user?.email ?? "Account"}
+                {user?.email ?? t("account")}
               </span>
               <ChevronDown className="h-4 w-4 opacity-60" />
             </Button>
@@ -60,7 +107,7 @@ export function Header() {
             <DropdownMenuItem asChild>
               <button type="button" onClick={handleSignOut} className="flex w-full items-center gap-2">
                 <LogOut className="h-4 w-4" />
-                Sign out
+                {t("signOut")}
               </button>
             </DropdownMenuItem>
           </DropdownMenuContent>

@@ -17,6 +17,7 @@ export interface Database {
           store_name: string | null;
           branch_id: string | null;
           avatar_url: string | null;
+          language: string | null;
           updated_at: string;
         };
         Insert: {
@@ -26,6 +27,7 @@ export interface Database {
           store_name?: string | null;
           branch_id?: string | null;
           avatar_url?: string | null;
+          language?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -35,6 +37,7 @@ export interface Database {
           store_name?: string | null;
           branch_id?: string | null;
           avatar_url?: string | null;
+          language?: string | null;
           updated_at?: string;
         };
       };

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Radar,
@@ -30,14 +31,13 @@ const DEFAULT_DATA = [
 ];
 
 export function QualityRadarChart({ data = DEFAULT_DATA }: QualityRadarChartProps) {
+  const t = useTranslations("dashboard");
   const hasValues = data.some((d) => d.value > 0);
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-[var(--gray-dark)]">Quality Profile</CardTitle>
-        <CardDescription>
-          Sensory attributes (0–100). Add records to see data.
-        </CardDescription>
+        <CardTitle className="text-[var(--gray-dark)]">{t("qualityProfile")}</CardTitle>
+        <CardDescription>{t("qualityProfileDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="h-[320px] w-full">
@@ -56,7 +56,7 @@ export function QualityRadarChart({ data = DEFAULT_DATA }: QualityRadarChartProp
                 tickCount={5}
               />
               <Radar
-                name="Score"
+                name={t("score")}
                 dataKey="value"
                 stroke={COLORS.stroke}
                 fill={COLORS.fill}
@@ -69,7 +69,7 @@ export function QualityRadarChart({ data = DEFAULT_DATA }: QualityRadarChartProp
                   border: "1px solid var(--border)",
                   borderRadius: "var(--radius)",
                 }}
-                formatter={(value: number) => [value, "Score"]}
+                formatter={(value: number) => [value, t("score")]}
               />
             </RadarChart>
           </ResponsiveContainer>

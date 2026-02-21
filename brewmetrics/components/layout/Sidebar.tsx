@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, usePathname } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 import {
   LayoutDashboard,
   Coffee,
@@ -11,14 +11,15 @@ import {
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/bean-profiles", label: "Bean Profiles", icon: Coffee },
-  { href: "/digital-twin", label: "Digital Twin", icon: Gauge },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/", labelKey: "nav.dashboard" as const, icon: LayoutDashboard },
+  { href: "/bean-profiles", labelKey: "nav.beanProfiles" as const, icon: Coffee },
+  { href: "/digital-twin", labelKey: "nav.digitalTwin" as const, icon: Gauge },
+  { href: "/settings", labelKey: "nav.settings" as const, icon: Settings },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
+  const t = useTranslations();
 
   return (
     <aside
@@ -30,7 +31,7 @@ export function Sidebar() {
           <Coffee className="h-5 w-5" />
         </div>
         <span className="text-lg font-semibold tracking-tight text-[var(--gray-dark)]">
-          BrewMetrics
+          {t("common.appName")}
         </span>
       </div>
       <nav className="flex-1 space-y-0.5 p-4">
@@ -53,14 +54,14 @@ export function Sidebar() {
               <item.icon
                 className={cn("h-5 w-5 shrink-0", isActive && "text-[var(--primary)]")}
               />
-              {item.label}
+              {t(item.labelKey)}
             </Link>
           );
         })}
       </nav>
       <div className="border-t border-[var(--border)] p-4">
         <p className="text-xs text-[var(--muted-foreground)]">
-          Coffee quality platform
+          {t("nav.coffeeQualityPlatform")}
         </p>
       </div>
     </aside>

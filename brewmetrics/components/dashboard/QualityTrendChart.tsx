@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   XAxis,
@@ -23,16 +24,15 @@ interface QualityTrendChartProps {
 }
 
 export function QualityTrendChart({ data }: QualityTrendChartProps) {
+  const t = useTranslations("dashboard");
   const hasData = data.length > 0;
   const target = 85;
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-[var(--gray-dark)]">Quality Trend</CardTitle>
-        <CardDescription>
-          Cupping score over time from your roasting records
-        </CardDescription>
+        <CardTitle className="text-[var(--gray-dark)]">{t("qualityTrendChart")}</CardTitle>
+        <CardDescription>{t("qualityTrendChartDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="h-[320px] w-full">
@@ -66,7 +66,7 @@ export function QualityTrendChart({ data }: QualityTrendChartProps) {
                   border: "1px solid var(--border)",
                   borderRadius: "var(--radius)",
                 }}
-                formatter={(value: number) => [value.toFixed(1), "Score"]}
+                formatter={(value: number) => [value.toFixed(1), t("score")]}
                 labelFormatter={(label) => (label ? `Date: ${label}` : "")}
               />
               <Area
@@ -85,7 +85,7 @@ export function QualityTrendChart({ data }: QualityTrendChartProps) {
                   stroke="var(--muted-foreground)"
                   strokeDasharray="4 4"
                   strokeWidth={1}
-                  label={{ value: "Target", position: "right" }}
+                  label={{ value: t("target"), position: "right" }}
                 />
               )}
             </AreaChart>

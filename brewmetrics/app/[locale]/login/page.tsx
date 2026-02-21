@@ -1,19 +1,23 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { Link, useRouter } from "@/i18n/routing";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Coffee } from "lucide-react";
+import { useTranslations } from "next-intl";
 
-export default function SignupPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo") ?? "/";
+  const t = useTranslations("auth");
+  const tCommon = useTranslations("common");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,21 +27,17 @@ export default function SignupPage() {
     setLoading(true);
     const supabase = createClient();
     if (!supabase) {
-      setError("App is not configured. Add Supabase env variables.");
+      setError(t("notConfigured"));
       setLoading(false);
       return;
     }
-    const { error: err } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: fullName } },
-    });
+    const { error: err } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (err) {
       setError(err.message);
       return;
     }
-    router.push("/");
+    router.push(redirectTo);
     router.refresh();
   }
 
@@ -48,8 +48,8 @@ export default function SignupPage() {
           <Link href="/" className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--coffee-700)] text-[var(--cream)]">
             <Coffee className="h-6 w-6" />
           </Link>
-          <CardTitle className="text-2xl font-semibold text-[var(--gray-dark)]">BrewMetrics</CardTitle>
-          <CardDescription>Create your account</CardDescription>
+          <CardTitle className="text-2xl font-semibold text-[var(--gray-dark)]">{tCommon("appName")}</CardTitle>
+          <CardDescription>{t("signInToAccount")}</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
@@ -59,22 +59,8 @@ export default function SignupPage() {
               </div>
             )}
             <div className="space-y-2">
-              <label htmlFor="fullName" className="text-sm font-medium text-[var(--foreground)]">
-                Full name
-              </label>
-              <Input
-                id="fullName"
-                type="text"
-                placeholder="Jane Doe"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                autoComplete="name"
-                className="border-[var(--border)]"
-              />
-            </div>
-            <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-[var(--foreground)]">
-                Email
+                {t("email")}
               </label>
               <Input
                 id="email"
@@ -89,34 +75,40 @@ export default function SignupPage() {
             </div>
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium text-[var(--foreground)]">
-                Password
+                {t("password")}
               </label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Min. 6 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={6}
-                autoComplete="new-password"
+                autoComplete="current-password"
                 className="border-[var(--border)]"
               />
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Creating account…" : "Sign up"}
+              {loading ? t("signingIn") : t("signIn")}
             </Button>
             <p className="text-center text-sm text-[var(--muted-foreground)]">
-              Already have an account?{" "}
-              <Link href="/login" className="font-medium text-[var(--primary)] hover:underline">
-                Sign in
+              {t("noAccount")}{" "}
+              <Link href="/signup" className="font-medium text-[var(--primary)] hover:underline">
+                {t("signUp")}
               </Link>
             </p>
           </CardFooter>
         </form>
       </Card>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--primary)] border-t-transparent" /></div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

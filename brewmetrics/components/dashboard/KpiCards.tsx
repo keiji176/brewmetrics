@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Coffee, Star, Hash, BarChart3 } from "lucide-react";
 
@@ -10,31 +11,19 @@ interface KpiCardsProps {
 }
 
 export function KpiCards({ totalRecords, avgCupping, recentTrend }: KpiCardsProps) {
+  const t = useTranslations("dashboard");
+  const trendLabel =
+    recentTrend === "up" ? t("improving") : recentTrend === "down" ? t("declining") : t("stable");
   const kpis = [
+    { title: t("totalRecords"), value: String(totalRecords), sub: t("totalRecordsSub"), icon: Hash },
     {
-      title: "Total Records",
-      value: String(totalRecords),
-      sub: "roasting records",
-      icon: Hash,
-    },
-    {
-      title: "Average Cupping Score",
+      title: t("averageCuppingScore"),
       value: avgCupping != null ? avgCupping.toFixed(1) : "—",
-      sub: "across all batches",
+      sub: t("averageCuppingScoreSub"),
       icon: Star,
     },
-    {
-      title: "Batches Tracked",
-      value: String(totalRecords),
-      sub: "in your profile",
-      icon: Coffee,
-    },
-    {
-      title: "Quality Trend",
-      value: recentTrend === "up" ? "Improving" : recentTrend === "down" ? "Declining" : "Stable",
-      sub: "vs recent data",
-      icon: BarChart3,
-    },
+    { title: t("batchesTracked"), value: String(totalRecords), sub: t("batchesTrackedSub"), icon: Coffee },
+    { title: t("qualityTrend"), value: trendLabel, sub: t("trendSub"), icon: BarChart3 },
   ];
 
   return (

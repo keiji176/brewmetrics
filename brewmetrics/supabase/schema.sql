@@ -1,5 +1,6 @@
 -- BrewMetrics — Production schema (run in Supabase SQL Editor)
 -- Secure, RLS-enabled. Users access only their own data.
+-- If profiles already exists, add language: alter table public.profiles add column if not exists language text default 'en';
 
 -- Profiles (extends auth.users) — one row per user
 create table if not exists public.profiles (
@@ -9,6 +10,7 @@ create table if not exists public.profiles (
   store_name text,
   branch_id text,
   avatar_url text,
+  language text default 'en' check (language in ('en', 'ja')),
   updated_at timestamptz default now()
 );
 
@@ -71,11 +73,12 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
-  insert into public.profiles (id, email, full_name)
+  insert into public.profiles (id, email, full_name, language)
   values (
     new.id,
     new.email,
-    coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', '')
+    coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', ''),
+    'en'
   );
   return new;
 end;

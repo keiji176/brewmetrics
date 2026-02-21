@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { ResponsiveContainer, RadialBarChart, RadialBar, Legend } from "recharts";
+import { useTranslations } from "next-intl";
 
 function computeScore(temperature: number, grindSize: number, extractionTime: number): number {
   return Math.max(
@@ -19,6 +20,7 @@ function computeScore(temperature: number, grindSize: number, extractionTime: nu
 }
 
 export default function DigitalTwinPage() {
+  const t = useTranslations("digitalTwin");
   const [temperature, setTemperature] = useState(205);
   const [grindSize, setGrindSize] = useState(5);
   const [extractionTime, setExtractionTime] = useState(28);
@@ -28,31 +30,27 @@ export default function DigitalTwinPage() {
     [temperature, grindSize, extractionTime]
   );
 
-  const gaugeData = [{ name: "Quality", value: score, fill: "rgb(92, 74, 56)" }];
+  const gaugeData = [{ name: t("quality"), value: score, fill: "rgb(92, 74, 56)" }];
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-[var(--gray-dark)]">
-          Live Coffee Digital Twin
+          {t("title")}
         </h1>
-        <p className="mt-1 text-sm text-[var(--muted-foreground)]">
-          Interactive simulation — adjust parameters and see quality score in real time (no AI, pure formula)
-        </p>
+        <p className="mt-1 text-sm text-[var(--muted-foreground)]">{t("description")}</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="text-[var(--gray-dark)]">Parameters</CardTitle>
-            <CardDescription>
-              Temperature 180–230°C · Grind 1–10 · Extraction 15–40s
-            </CardDescription>
+            <CardTitle className="text-[var(--gray-dark)]">{t("parameters")}</CardTitle>
+            <CardDescription>{t("parametersDescription")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <Label>Temperature (°C)</Label>
+                <Label>{t("temperature")} ({t("temperatureUnit")})</Label>
                 <span className="font-medium text-[var(--foreground)]">{temperature}</span>
               </div>
               <input
@@ -66,7 +64,7 @@ export default function DigitalTwinPage() {
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <Label>Grind Size (1–10)</Label>
+                <Label>{t("grindSize")} ({t("grindRange")})</Label>
                 <span className="font-medium text-[var(--foreground)]">{grindSize}</span>
               </div>
               <input
@@ -80,7 +78,7 @@ export default function DigitalTwinPage() {
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <Label>Extraction Time (s)</Label>
+                <Label>{t("extractionTime")} ({t("extractionUnit")})</Label>
                 <span className="font-medium text-[var(--foreground)]">{extractionTime}</span>
               </div>
               <input
@@ -97,8 +95,8 @@ export default function DigitalTwinPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-[var(--gray-dark)]">Simulated Quality Score</CardTitle>
-            <CardDescription>Formula: 100 − |205−T|×0.3 − |5−G|×1.5 − |28−E|×0.8</CardDescription>
+            <CardTitle className="text-[var(--gray-dark)]">{t("simulatedQualityScore")}</CardTitle>
+            <CardDescription>{t("formula")}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col items-center gap-6">

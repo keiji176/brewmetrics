@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ScatterChart,
@@ -24,6 +25,7 @@ interface AdvancedAnalyticsScatterProps {
 }
 
 export function AdvancedAnalyticsScatter({ data }: AdvancedAnalyticsScatterProps) {
+  const t = useTranslations("dashboard");
   const chartData = data.map((d) => ({
     x: d.roast_temperature,
     y: d.cupping_score,
@@ -34,11 +36,11 @@ export function AdvancedAnalyticsScatter({ data }: AdvancedAnalyticsScatterProps
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-[var(--gray-dark)]">Advanced Analytics</CardTitle>
-          <CardDescription>Roast temperature vs cupping score</CardDescription>
+          <CardTitle className="text-[var(--gray-dark)]">{t("advancedAnalytics")}</CardTitle>
+          <CardDescription>{t("scatterDescription")}</CardDescription>
         </CardHeader>
         <CardContent className="flex h-[320px] items-center justify-center text-sm text-[var(--muted-foreground)]">
-          Add roasting records with temperature and cupping score to see the correlation.
+          {t("scatterEmpty")}
         </CardContent>
       </Card>
     );
@@ -47,10 +49,8 @@ export function AdvancedAnalyticsScatter({ data }: AdvancedAnalyticsScatterProps
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-[var(--gray-dark)]">Advanced Analytics</CardTitle>
-        <CardDescription>
-          Roast temperature vs cupping score — stable temperatures typically improve quality
-        </CardDescription>
+        <CardTitle className="text-[var(--gray-dark)]">{t("advancedAnalytics")}</CardTitle>
+        <CardDescription>{t("scatterDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="h-[320px] w-full">
@@ -70,7 +70,7 @@ export function AdvancedAnalyticsScatter({ data }: AdvancedAnalyticsScatterProps
               <YAxis
                 type="number"
                 dataKey="y"
-                name="Cupping score"
+                name={t("score")}
                 domain={["dataMin - 2", "dataMax + 2"]}
                 tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
                 axisLine={false}
@@ -92,7 +92,7 @@ export function AdvancedAnalyticsScatter({ data }: AdvancedAnalyticsScatterProps
               />
               <Legend />
               <Scatter
-                name="Batch"
+                name={t("batch")}
                 data={chartData}
                 fill="rgb(92, 74, 56)"
                 fillOpacity={0.8}

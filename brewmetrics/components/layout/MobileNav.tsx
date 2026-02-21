@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, usePathname } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 import {
   LayoutDashboard,
   Coffee,
@@ -15,15 +15,16 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/bean-profiles", label: "Bean Profiles", icon: Coffee },
-  { href: "/digital-twin", label: "Digital Twin", icon: Gauge },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/", labelKey: "nav.dashboard" as const, icon: LayoutDashboard },
+  { href: "/bean-profiles", labelKey: "nav.beanProfiles" as const, icon: Coffee },
+  { href: "/digital-twin", labelKey: "nav.digitalTwin" as const, icon: Gauge },
+  { href: "/settings", labelKey: "nav.settings" as const, icon: Settings },
 ];
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const t = useTranslations();
 
   return (
     <>
@@ -45,7 +46,7 @@ export function MobileNav() {
           />
           <div className="fixed left-0 top-0 z-50 flex h-full w-64 flex-col border-r border-[var(--border)] bg-[var(--card)] lg:hidden">
             <div className="flex h-16 items-center justify-between border-b border-[var(--border)] px-4">
-              <span className="font-semibold text-[var(--gray-dark)]">BrewMetrics</span>
+              <span className="font-semibold text-[var(--gray-dark)]">{t("common.appName")}</span>
               <Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Close menu">
                 <X className="h-5 w-5" />
               </Button>
@@ -68,7 +69,7 @@ export function MobileNav() {
                     )}
                   >
                     <item.icon className="h-5 w-5 shrink-0" />
-                    {item.label}
+                    {t(item.labelKey)}
                   </Link>
                 );
               })}

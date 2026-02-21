@@ -8,6 +8,7 @@ import { QualityRadarChart } from "@/components/dashboard/QualityRadarChart";
 import { QualityTrendChart } from "@/components/dashboard/QualityTrendChart";
 import { AdvancedAnalyticsScatter } from "@/components/dashboard/AdvancedAnalyticsScatter";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 function useRoastingRecords() {
   const [records, setRecords] = useState<RoastingRecordRow[]>([]);
@@ -39,6 +40,8 @@ function useRoastingRecords() {
 }
 
 export default function DashboardPage() {
+  const t = useTranslations("dashboard");
+  const tCommon = useTranslations("common");
   const { records, loading, error } = useRoastingRecords();
 
   const totalRecords = records.length;
@@ -112,7 +115,7 @@ export default function DashboardPage() {
       <div className="space-y-8">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-[var(--gray-dark)]">
-            Dashboard
+            {t("title")}
           </h1>
         </div>
         <div className="rounded-xl border border-rose-200 bg-rose-50/50 p-6 text-sm text-rose-700">
@@ -126,11 +129,9 @@ export default function DashboardPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-[var(--gray-dark)]">
-          Dashboard
+          {t("title")}
         </h1>
-        <p className="mt-1 text-sm text-[var(--muted-foreground)]">
-          Overview of your roastery quality metrics
-        </p>
+        <p className="mt-1 text-sm text-[var(--muted-foreground)]">{t("description")}</p>
       </div>
 
       <KpiCards
@@ -145,7 +146,7 @@ export default function DashboardPage() {
 
       <div>
         <h2 className="mb-4 text-lg font-semibold text-[var(--gray-dark)]">
-          Advanced Analytics
+          {t("advancedAnalytics")}
         </h2>
         <AdvancedAnalyticsScatter data={scatterData} />
       </div>
