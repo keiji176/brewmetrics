@@ -15,7 +15,10 @@
   "nav": {
     "dashboard": "ダッシュボード",
     "beanProfiles": "Bean Profiles",
+    "brewRecords": "抽出記録",
     "digitalTwin": "デジタルツイン",
+    "gearGuide": "器具ガイド",
+    "glossary": "用語解説",
     "settings": "設定",
     "coffeeQualityPlatform": "コーヒー品質プラットフォーム"
   },
@@ -88,6 +91,37 @@
     "deleteConfirm": "この焙煎レコードを削除しますか？",
     "unnamed": "名前なし"
   },
+  "brewRecords": {
+    "title": "抽出ジャーナル",
+    "description": "毎日の抽出レシピと味のメモを記録しましょう",
+    "addRecord": "抽出記録を追加",
+    "newRecord": "新規抽出記録",
+    "editRecord": "抽出記録を編集",
+    "fieldsOptional": "各項目は任意です。",
+    "beanName": "豆の名前",
+    "beanNamePlaceholder": "例：エチオピア イルガチェフ",
+    "roaster": "ロースター / 購入店",
+    "roasterPlaceholder": "例：ONIBUS COFFEE",
+    "grindSize": "挽き目",
+    "grindSizePlaceholder": "例：中細挽き",
+    "waterTemperature": "湯温（°C）",
+    "waterTemperaturePlaceholder": "92",
+    "brewMethod": "抽出器具 / 抽出方法",
+    "brewMethodPlaceholder": "例：V60、エアロプレス、フレンチプレス",
+    "scoreOrImpression": "カッピングスコア（任意）",
+    "scorePlaceholder": "85",
+    "notes": "感想・メモ",
+    "notesPlaceholder": "風味、蒸らし、甘さ、ボディなどを記録",
+    "noRecords": "抽出記録がありません",
+    "noRecordsHint": "最初の一杯を記録して、あなたのコーヒーノートを始めましょう。",
+    "saving": "保存中…",
+    "deleteConfirm": "この抽出記録を削除しますか？",
+    "unnamed": "名前なしの豆",
+    "grind": "挽き目",
+    "waterTemp": "湯温",
+    "brewMethodShort": "器具",
+    "score": "スコア"
+  },
   "digitalTwin": {
     "title": "ライブコーヒー デジタルツイン",
     "description": "インタラクティブシミュレーション — パラメータを調整し品質スコアをリアルタイムで確認（AIなし・数式ベース）",
@@ -102,6 +136,16 @@
     "simulatedQualityScore": "シミュレーション品質スコア",
     "formula": "数式: 100 − |205−T|×0.3 − |5−G|×1.5 − |28−E|×0.8",
     "quality": "品質"
+  },
+  "gearGuide": {
+    "title": "コーヒー器具ガイド",
+    "description": "ホームバリスタ向けの定番器具をカードで紹介"
+  },
+  "glossary": {
+    "title": "コーヒー用語解説",
+    "description": "よく使われる用語を理解して、抽出をもっと楽しみましょう",
+    "searchPlaceholder": "用語を検索（例：酸味、ブルーム、抽出）",
+    "noResults": "該当する用語が見つかりませんでした。別のキーワードをお試しください。"
   },
   "settings": {
     "title": "設定",

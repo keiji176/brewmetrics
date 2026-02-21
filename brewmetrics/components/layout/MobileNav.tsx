@@ -6,7 +6,10 @@ import { useTranslations } from "next-intl";
 import {
   LayoutDashboard,
   Coffee,
+  FileText,
   Gauge,
+  Wrench,
+  BookOpen,
   Settings,
   Menu,
   X,
@@ -17,7 +20,10 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { href: "/", labelKey: "nav.dashboard" as const, icon: LayoutDashboard },
   { href: "/bean-profiles", labelKey: "nav.beanProfiles" as const, icon: Coffee },
+  { href: "/brew-records", labelKey: "nav.brewRecords" as const, icon: FileText },
   { href: "/digital-twin", labelKey: "nav.digitalTwin" as const, icon: Gauge },
+  { href: "/gear-guide", labelKey: "nav.gearGuide" as const, icon: Wrench },
+  { href: "/glossary", labelKey: "nav.glossary" as const, icon: BookOpen },
   { href: "/settings", labelKey: "nav.settings" as const, icon: Settings },
 ];
 
