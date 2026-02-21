@@ -1,6 +1,6 @@
 "use client";
 
-import { Link, usePathname } from "@/i18n/routing";
+import { Link, usePathname } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import {
   LayoutDashboard,

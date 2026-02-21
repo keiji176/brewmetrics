@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "@/i18n/routing";
+import { useRouter, usePathname } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
 import { useTranslations } from "next-intl";
 import { ChevronDown, LogOut, User } from "lucide-react";
