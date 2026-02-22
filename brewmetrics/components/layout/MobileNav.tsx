@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import {
@@ -29,8 +30,57 @@ const navItems = [
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const t = useTranslations();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const mobileMenu = (
+    <>
+      <div
+        className="fixed inset-0 z-40 bg-black/60 lg:hidden"
+        aria-hidden
+        onClick={() => setOpen(false)}
+      />
+      <div
+        className="fixed left-0 top-0 z-50 isolate flex h-dvh w-64 flex-col border-r border-[var(--border)] !bg-[var(--background)] text-[var(--foreground)] opacity-100 shadow-2xl lg:hidden"
+        style={{ backgroundColor: "var(--background)" }}
+      >
+        <div className="flex h-16 items-center justify-between border-b border-[var(--border)] px-4">
+          <span className="font-semibold text-[var(--gray-dark)]">{t("common.appName")}</span>
+          <Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Close menu">
+            <X className="h-5 w-5" />
+          </Button>
+        </div>
+        <nav className="flex-1 space-y-0.5 overflow-y-auto p-4">
+          {navItems.map((item) => {
+            const isActive =
+              pathname === item.href ||
+              (item.href !== "/" && pathname.startsWith(item.href));
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium",
+                  isActive
+                    ? "bg-[var(--accent)] text-[var(--primary)]"
+                    : "text-[var(--muted-foreground)] hover:bg-[var(--muted)]"
+                )}
+              >
+                <item.icon className="h-5 w-5 shrink-0" />
+                {t(item.labelKey)}
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+    </>
+  );
 
   return (
     <>
@@ -43,49 +93,7 @@ export function MobileNav() {
       >
         <Menu className="h-5 w-5" />
       </Button>
-      {open && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-black/60 lg:hidden"
-            aria-hidden
-            onClick={() => setOpen(false)}
-          />
-          <div
-            className="fixed left-0 top-0 z-50 isolate flex h-full w-64 flex-col border-r border-[var(--border)] !bg-[var(--background)] text-[var(--foreground)] opacity-100 shadow-2xl lg:hidden"
-            style={{ backgroundColor: "var(--background)" }}
-          >
-            <div className="flex h-16 items-center justify-between border-b border-[var(--border)] px-4">
-              <span className="font-semibold text-[var(--gray-dark)]">{t("common.appName")}</span>
-              <Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Close menu">
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
-            <nav className="flex-1 space-y-0.5 p-4">
-              {navItems.map((item) => {
-                const isActive =
-                  pathname === item.href ||
-                  (item.href !== "/" && pathname.startsWith(item.href));
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium",
-                      isActive
-                        ? "bg-[var(--accent)] text-[var(--primary)]"
-                        : "text-[var(--muted-foreground)] hover:bg-[var(--muted)]"
-                    )}
-                  >
-                    <item.icon className="h-5 w-5 shrink-0" />
-                    {t(item.labelKey)}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
-        </>
-      )}
+      {open && mounted ? createPortal(mobileMenu, document.body) : null}
     </>
   );
 }
