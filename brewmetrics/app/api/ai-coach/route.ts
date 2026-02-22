@@ -67,7 +67,7 @@ export async function POST(req: Request) {
     const userPrompt = JSON.stringify({ context, entries }, null, 2);
 
     const response = await anthropic.messages.create({
-      model: "claude-3-5-haiku-latest",
+      model: "claude-3-5-sonnet-20241022",
       max_tokens: 240,
       temperature: 0.4,
       system: systemPrompt,
