@@ -223,6 +223,14 @@
       }
     }
   },
+  "aiCoach": {
+    "title": "AI Barista Coach",
+    "descriptionBrew": "Analyze your recent brew journal and get one practical next-step recommendation.",
+    "descriptionRoast": "Analyze your recent roast records and get one practical next-step recommendation.",
+    "button": "Get AI Advice",
+    "loading": "Generating advice…",
+    "noData": "Add records to receive personalized coaching."
+  },
   "settings": {
     "title": "Settings",
     "description": "Manage your account and preferences",

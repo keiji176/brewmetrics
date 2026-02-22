@@ -21,6 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { AICoachPanel } from "@/components/ai-coach/AICoachPanel";
 import { Coffee, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -461,6 +462,8 @@ export default function BrewRecordsPage() {
           placeholder={t("searchPlaceholder")}
         />
       </div>
+
+      <AICoachPanel context="brew" entries={records} />
 
       {error && (
         <Card className="border-rose-200 bg-rose-50/50">

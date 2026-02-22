@@ -7,6 +7,7 @@ import { KpiCards } from "@/components/dashboard/KpiCards";
 import { QualityRadarChart } from "@/components/dashboard/QualityRadarChart";
 import { QualityTrendChart } from "@/components/dashboard/QualityTrendChart";
 import { AdvancedAnalyticsScatter } from "@/components/dashboard/AdvancedAnalyticsScatter";
+import { AICoachPanel } from "@/components/ai-coach/AICoachPanel";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -139,6 +140,9 @@ export default function DashboardPage() {
         avgCupping={avgCupping}
         recentTrend={recentTrend}
       />
+
+      <AICoachPanel context="roast" entries={records} />
+
       <div className="grid gap-6 lg:grid-cols-2">
         <QualityRadarChart data={radarData} />
         <QualityTrendChart data={trendData} />
