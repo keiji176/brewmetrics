@@ -21,6 +21,16 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  function normalizeRedirectPath(path: string) {
+    const safePath = path.startsWith("/") ? path : `/${path}`;
+    const segments = safePath.split("/").filter(Boolean);
+    if (segments.length > 0 && (segments[0] === "en" || segments[0] === "ja")) {
+      const rest = segments.slice(1).join("/");
+      return rest ? `/${rest}` : "/";
+    }
+    return safePath;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -37,7 +47,7 @@ function LoginForm() {
       setError(err.message);
       return;
     }
-    router.push(redirectTo);
+    router.push(normalizeRedirectPath(redirectTo));
     router.refresh();
   }
 

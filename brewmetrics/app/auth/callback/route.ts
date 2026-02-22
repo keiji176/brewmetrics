@@ -4,10 +4,22 @@ import { NextResponse } from "next/server";
 
 const LOCALES = ["en", "ja"] as const;
 
+function normalizeNextPath(nextPath: string) {
+  const safePath = nextPath.startsWith("/") ? nextPath : `/${nextPath}`;
+  const segments = safePath.split("/").filter(Boolean);
+
+  if (segments.length >= 2 && LOCALES.includes(segments[0] as (typeof LOCALES)[number]) && segments[0] === segments[1]) {
+    const deduped = [segments[0], ...segments.slice(2)].join("/");
+    return `/${deduped}`;
+  }
+
+  return safePath;
+}
+
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  let next = searchParams.get("next") ?? "/";
+  let next = normalizeNextPath(searchParams.get("next") ?? "/");
 
   if (code) {
     const cookieStore = await cookies();
