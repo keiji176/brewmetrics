@@ -66,14 +66,13 @@ export async function POST(req: Request) {
 
     const userPrompt = JSON.stringify({ context, entries }, null, 2);
 
-    const response = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
+    const requestPayload = {
       max_tokens: 240,
       temperature: 0.4,
       system: systemPrompt,
       messages: [
         {
-          role: "user",
+          role: "user" as const,
           content:
             (locale === "ja"
               ? "以下の記録データを分析し、次回もっと美味しくするための具体的アドバイスをください。"
@@ -82,7 +81,28 @@ export async function POST(req: Request) {
             userPrompt,
         },
       ],
-    });
+    };
+
+    let response;
+    try {
+      response = await anthropic.messages.create({
+        model: "claude-3-5-sonnet-20240620",
+        ...requestPayload,
+      });
+    } catch (modelError) {
+      const message = modelError instanceof Error ? modelError.message : String(modelError);
+      const isModelNotFound =
+        message.includes("not_found_error") && message.includes("model:");
+
+      if (!isModelNotFound) {
+        throw modelError;
+      }
+
+      response = await anthropic.messages.create({
+        model: "claude-3-haiku-20240307",
+        ...requestPayload,
+      });
+    }
 
     const advice = response.content
       .map((block) => (block.type === "text" ? block.text : ""))
