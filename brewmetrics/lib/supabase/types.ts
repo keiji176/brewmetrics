@@ -41,6 +41,38 @@ export interface Database {
           updated_at?: string;
         };
       };
+      bean_profiles: {
+        Row: {
+          id: string;
+          user_id: string;
+          bean_name: string | null;
+          roaster: string | null;
+          origin: string | null;
+          roast_level: string | null;
+          process: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          bean_name?: string | null;
+          roaster?: string | null;
+          origin?: string | null;
+          roast_level?: string | null;
+          process?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          bean_name?: string | null;
+          roaster?: string | null;
+          origin?: string | null;
+          roast_level?: string | null;
+          process?: string | null;
+          created_at?: string;
+        };
+      };
       roasting_records: {
         Row: {
           id: string;
@@ -80,5 +112,7 @@ export interface Database {
   };
 }
 
+export type BeanProfileRow = Database["public"]["Tables"]["bean_profiles"]["Row"];
+export type BeanProfileInsert = Database["public"]["Tables"]["bean_profiles"]["Insert"];
 export type RoastingRecordRow = Database["public"]["Tables"]["roasting_records"]["Row"];
 export type RoastingRecordInsert = Database["public"]["Tables"]["roasting_records"]["Insert"];

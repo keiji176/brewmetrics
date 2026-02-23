@@ -89,6 +89,43 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
+-- Bean profiles — basic bean information for home baristas
+create table if not exists public.bean_profiles (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users (id) on delete cascade not null,
+  bean_name text,
+  roaster text,
+  origin text,
+  roast_level text,
+  process text,
+  created_at timestamptz default now() not null
+);
+
+alter table public.bean_profiles enable row level security;
+
+drop policy if exists "Users can read own bean_profiles" on public.bean_profiles;
+create policy "Users can read own bean_profiles"
+  on public.bean_profiles for select
+  using (auth.uid() = user_id);
+
+drop policy if exists "Users can insert own bean_profiles" on public.bean_profiles;
+create policy "Users can insert own bean_profiles"
+  on public.bean_profiles for insert
+  with check (auth.uid() = user_id);
+
+drop policy if exists "Users can update own bean_profiles" on public.bean_profiles;
+create policy "Users can update own bean_profiles"
+  on public.bean_profiles for update
+  using (auth.uid() = user_id);
+
+drop policy if exists "Users can delete own bean_profiles" on public.bean_profiles;
+create policy "Users can delete own bean_profiles"
+  on public.bean_profiles for delete
+  using (auth.uid() = user_id);
+
+create index if not exists bean_profiles_user_id_created_at_idx
+  on public.bean_profiles (user_id, created_at desc);
+
 -- Brew records — home barista extraction journal
 create table if not exists public.brew_records (
   id uuid default gen_random_uuid() primary key,

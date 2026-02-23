@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { RoastingRecordRow } from "@/lib/supabase/types";
+import type { BeanProfileRow } from "@/lib/supabase/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,25 +24,24 @@ import {
 import { Coffee, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-const emptyRecord = (userId: string): Omit<RoastingRecordRow, "id" | "created_at"> => ({
+const emptyRecord = (userId: string): Omit<BeanProfileRow, "id" | "created_at"> => ({
   user_id: userId,
   bean_name: "",
-  roast_temperature: null,
-  roast_time: null,
-  grind_size: "",
-  extraction_time: null,
-  cupping_score: null,
+  roaster: "",
+  origin: "",
+  roast_level: "",
+  process: "",
 });
 
 export default function BeanProfilesPage() {
   const t = useTranslations("beanProfiles");
   const tCommon = useTranslations("common");
-  const [records, setRecords] = useState<RoastingRecordRow[]>([]);
+  const [records, setRecords] = useState<BeanProfileRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editing, setEditing] = useState<RoastingRecordRow | null>(null);
+  const [editing, setEditing] = useState<BeanProfileRow | null>(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState(emptyRecord(""));
 
@@ -67,7 +66,7 @@ export default function BeanProfilesPage() {
     setLoading(true);
     setError(null);
     supabase
-      .from("roasting_records")
+      .from("bean_profiles")
       .select("*")
       .order("created_at", { ascending: false })
       .then(({ data, error: e }) => {
@@ -76,7 +75,7 @@ export default function BeanProfilesPage() {
           setError(e.message);
           return;
         }
-        setRecords((data as RoastingRecordRow[]) ?? []);
+        setRecords((data as BeanProfileRow[]) ?? []);
       });
   }, [supabase, userId]);
 
@@ -86,16 +85,15 @@ export default function BeanProfilesPage() {
     setDialogOpen(true);
   }
 
-  function openEdit(record: RoastingRecordRow) {
+  function openEdit(record: BeanProfileRow) {
     setEditing(record);
     setForm({
       user_id: record.user_id,
       bean_name: record.bean_name ?? "",
-      roast_temperature: record.roast_temperature,
-      roast_time: record.roast_time,
-      grind_size: record.grind_size ?? "",
-      extraction_time: record.extraction_time,
-      cupping_score: record.cupping_score,
+      roaster: record.roaster ?? "",
+      origin: record.origin ?? "",
+      roast_level: record.roast_level ?? "",
+      process: record.process ?? "",
     });
     setDialogOpen(true);
   }
@@ -106,15 +104,14 @@ export default function BeanProfilesPage() {
     setSaving(true);
     const payload = {
       bean_name: form.bean_name || null,
-      roast_temperature: form.roast_temperature != null ? Number(form.roast_temperature) : null,
-      roast_time: form.roast_time != null ? Number(form.roast_time) : null,
-      grind_size: form.grind_size || null,
-      extraction_time: form.extraction_time != null ? Number(form.extraction_time) : null,
-      cupping_score: form.cupping_score != null ? Number(form.cupping_score) : null,
+      roaster: form.roaster || null,
+      origin: form.origin || null,
+      roast_level: form.roast_level || null,
+      process: form.process || null,
     };
     if (editing) {
       const { error: e } = await supabase
-        .from("roasting_records")
+        .from("bean_profiles")
         .update(payload)
         .eq("id", editing.id);
       setSaving(false);
@@ -127,7 +124,7 @@ export default function BeanProfilesPage() {
       );
     } else {
       const { data, error: e } = await supabase
-        .from("roasting_records")
+        .from("bean_profiles")
         .insert({ ...payload, user_id: userId })
         .select()
         .single();
@@ -136,14 +133,14 @@ export default function BeanProfilesPage() {
         setError(e.message);
         return;
       }
-      if (data) setRecords((prev) => [data as RoastingRecordRow, ...prev]);
+      if (data) setRecords((prev) => [data as BeanProfileRow, ...prev]);
     }
     setDialogOpen(false);
   }
 
   async function handleDelete(id: string) {
     if (!supabase || !confirm(t("deleteConfirm"))) return;
-    const { error: e } = await supabase.from("roasting_records").delete().eq("id", id);
+    const { error: e } = await supabase.from("bean_profiles").delete().eq("id", id);
     if (e) setError(e.message);
     else setRecords((prev) => prev.filter((r) => r.id !== id));
   }
@@ -180,82 +177,41 @@ export default function BeanProfilesPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="roast_temperature">{t("roastTemp")}</Label>
+                    <Label htmlFor="roaster">{t("roaster")}</Label>
                     <Input
-                      id="roast_temperature"
-                      type="number"
-                      min={180}
-                      max={230}
-                      value={form.roast_temperature ?? ""}
-                      onChange={(e) =>
-                        setForm((f) => ({
-                          ...f,
-                          roast_temperature: e.target.value ? Number(e.target.value) : null,
-                        }))
-                      }
-                      placeholder={t("roastTempPlaceholder")}
+                      id="roaster"
+                      value={form.roaster ?? ""}
+                      onChange={(e) => setForm((f) => ({ ...f, roaster: e.target.value }))}
+                      placeholder={t("roasterPlaceholder")}
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="roast_time">{t("roastTime")}</Label>
+                    <Label htmlFor="origin">{t("origin")}</Label>
                     <Input
-                      id="roast_time"
-                      type="number"
-                      min={0}
-                      step={0.5}
-                      value={form.roast_time ?? ""}
-                      onChange={(e) =>
-                        setForm((f) => ({
-                          ...f,
-                          roast_time: e.target.value ? Number(e.target.value) : null,
-                        }))
-                      }
-                      placeholder={t("roastTimePlaceholder")}
+                      id="origin"
+                      value={form.origin ?? ""}
+                      onChange={(e) => setForm((f) => ({ ...f, origin: e.target.value }))}
+                      placeholder={t("originPlaceholder")}
                     />
                   </div>
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="grind_size">{t("grindSize")}</Label>
-                  <Input
-                    id="grind_size"
-                    value={form.grind_size ?? ""}
-                    onChange={(e) => setForm((f) => ({ ...f, grind_size: e.target.value }))}
-                    placeholder={t("grindSizePlaceholder")}
-                  />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="extraction_time">{t("extractionTime")}</Label>
+                    <Label htmlFor="roast_level">{t("roastLevel")}</Label>
                     <Input
-                      id="extraction_time"
-                      type="number"
-                      min={0}
-                      value={form.extraction_time ?? ""}
-                      onChange={(e) =>
-                        setForm((f) => ({
-                          ...f,
-                          extraction_time: e.target.value ? Number(e.target.value) : null,
-                        }))
-                      }
-                      placeholder={t("extractionTimePlaceholder")}
+                      id="roast_level"
+                      value={form.roast_level ?? ""}
+                      onChange={(e) => setForm((f) => ({ ...f, roast_level: e.target.value }))}
+                      placeholder={t("roastLevelPlaceholder")}
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="cupping_score">{t("cuppingScore")}</Label>
+                    <Label htmlFor="process">{t("process")}</Label>
                     <Input
-                      id="cupping_score"
-                      type="number"
-                      min={0}
-                      max={100}
-                      step={0.5}
-                      value={form.cupping_score ?? ""}
-                      onChange={(e) =>
-                        setForm((f) => ({
-                          ...f,
-                          cupping_score: e.target.value ? Number(e.target.value) : null,
-                        }))
-                      }
-                      placeholder={t("cuppingScorePlaceholder")}
+                      id="process"
+                      value={form.process ?? ""}
+                      onChange={(e) => setForm((f) => ({ ...f, process: e.target.value }))}
+                      placeholder={t("processPlaceholder")}
                     />
                   </div>
                 </div>
@@ -336,26 +292,17 @@ export default function BeanProfilesPage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-1 text-sm">
-                {record.roast_temperature != null && (
-                  <p className="text-[var(--muted-foreground)]">
-                    {t("temp")}: {record.roast_temperature}°C
-                  </p>
+                {record.roaster && (
+                  <p className="text-[var(--muted-foreground)]">{t("roaster")}: {record.roaster}</p>
                 )}
-                {record.roast_time != null && (
-                  <p className="text-[var(--muted-foreground)]">{t("time")}: {record.roast_time} min</p>
+                {record.origin && (
+                  <p className="text-[var(--muted-foreground)]">{t("origin")}: {record.origin}</p>
                 )}
-                {record.grind_size && (
-                  <p className="text-[var(--muted-foreground)]">{t("grind")}: {record.grind_size}</p>
+                {record.roast_level && (
+                  <p className="text-[var(--muted-foreground)]">{t("roastLevel")}: {record.roast_level}</p>
                 )}
-                {record.extraction_time != null && (
-                  <p className="text-[var(--muted-foreground)]">
-                    {t("extraction")}: {record.extraction_time}s
-                  </p>
-                )}
-                {record.cupping_score != null && (
-                  <p className="font-medium text-[var(--primary)]">
-                    {t("cupping")}: {record.cupping_score}
-                  </p>
+                {record.process && (
+                  <p className="text-[var(--muted-foreground)]">{t("process")}: {record.process}</p>
                 )}
                 <p className="text-xs text-[var(--muted-foreground)]">
                   {new Date(record.created_at).toLocaleDateString()}
