@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { BeanProfileRow } from "@/lib/supabase/types";
 import { Button } from "@/components/ui/button";
@@ -27,11 +27,16 @@ import { useTranslations } from "next-intl";
 const emptyRecord = (userId: string): Omit<BeanProfileRow, "id" | "created_at"> => ({
   user_id: userId,
   bean_name: "",
+  variety: "",
   roaster: "",
   origin: "",
   roast_level: "",
   process: "",
 });
+
+const varietyOptions = ["Geisha", "Typica", "Bourbon", "Caturra", "Pacamara", "SL28"];
+
+type VarietySort = "none" | "az" | "za";
 
 export default function BeanProfilesPage() {
   const t = useTranslations("beanProfiles");
@@ -44,6 +49,8 @@ export default function BeanProfilesPage() {
   const [editing, setEditing] = useState<BeanProfileRow | null>(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState(emptyRecord(""));
+  const [varietyFilter, setVarietyFilter] = useState("all");
+  const [varietySort, setVarietySort] = useState<VarietySort>("none");
 
   const supabase = createClient();
 
@@ -90,6 +97,7 @@ export default function BeanProfilesPage() {
     setForm({
       user_id: record.user_id,
       bean_name: record.bean_name ?? "",
+      variety: record.variety ?? "",
       roaster: record.roaster ?? "",
       origin: record.origin ?? "",
       roast_level: record.roast_level ?? "",
@@ -104,6 +112,7 @@ export default function BeanProfilesPage() {
     setSaving(true);
     const payload = {
       bean_name: form.bean_name || null,
+      variety: form.variety || null,
       roaster: form.roaster || null,
       origin: form.origin || null,
       roast_level: form.roast_level || null,
@@ -145,6 +154,32 @@ export default function BeanProfilesPage() {
     else setRecords((prev) => prev.filter((r) => r.id !== id));
   }
 
+  const varietyValues = useMemo(() => {
+    return Array.from(
+      new Set(records.map((record) => record.variety?.trim()).filter((value): value is string => Boolean(value)))
+    ).sort((a, b) => a.localeCompare(b));
+  }, [records]);
+
+  const displayedRecords = useMemo(() => {
+    let next = [...records];
+
+    if (varietyFilter !== "all") {
+      next = next.filter((record) => (record.variety ?? "") === varietyFilter);
+    }
+
+    if (varietySort !== "none") {
+      next.sort((a, b) => {
+        const aVariety = a.variety?.toLowerCase() ?? "";
+        const bVariety = b.variety?.toLowerCase() ?? "";
+        if (aVariety === bVariety) return 0;
+        const base = aVariety.localeCompare(bVariety);
+        return varietySort === "az" ? base : -base;
+      });
+    }
+
+    return next;
+  }, [records, varietyFilter, varietySort]);
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -174,6 +209,21 @@ export default function BeanProfilesPage() {
                     onChange={(e) => setForm((f) => ({ ...f, bean_name: e.target.value }))}
                     placeholder={t("beanNamePlaceholder")}
                   />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="variety">{t("variety")}</Label>
+                  <Input
+                    id="variety"
+                    list="bean-variety-options"
+                    value={form.variety ?? ""}
+                    onChange={(e) => setForm((f) => ({ ...f, variety: e.target.value }))}
+                    placeholder={t("varietyPlaceholder")}
+                  />
+                  <datalist id="bean-variety-options">
+                    {varietyOptions.map((variety) => (
+                      <option key={variety} value={variety} />
+                    ))}
+                  </datalist>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
@@ -265,8 +315,45 @@ export default function BeanProfilesPage() {
           </CardContent>
         </Card>
       ) : (
+        <>
+          <div className="grid max-w-2xl gap-3 sm:grid-cols-2">
+            <div className="grid gap-1.5">
+              <Label htmlFor="bean-variety-filter" className="text-xs text-[var(--muted-foreground)]">
+                {t("varietyFilterLabel")}
+              </Label>
+              <select
+                id="bean-variety-filter"
+                value={varietyFilter}
+                onChange={(e) => setVarietyFilter(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-sm text-[var(--foreground)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+              >
+                <option value="all">{t("allVarieties")}</option>
+                {varietyValues.map((variety) => (
+                  <option key={variety} value={variety}>
+                    {variety}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="bean-variety-sort" className="text-xs text-[var(--muted-foreground)]">
+                {t("varietySortLabel")}
+              </Label>
+              <select
+                id="bean-variety-sort"
+                value={varietySort}
+                onChange={(e) => setVarietySort(e.target.value as VarietySort)}
+                className="flex h-10 w-full rounded-md border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-sm text-[var(--foreground)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+              >
+                <option value="none">{t("sortNone")}</option>
+                <option value="az">{t("sortAz")}</option>
+                <option value="za">{t("sortZa")}</option>
+              </select>
+            </div>
+          </div>
+
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {records.map((record) => (
+          {displayedRecords.map((record) => (
             <Card key={record.id} className="overflow-hidden">
               <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
                 <CardTitle className="text-base font-medium text-[var(--gray-dark)]">
@@ -292,6 +379,9 @@ export default function BeanProfilesPage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-1 text-sm">
+                {record.variety && (
+                  <p className="text-[var(--muted-foreground)]">{t("variety")}: {record.variety}</p>
+                )}
                 {record.roaster && (
                   <p className="text-[var(--muted-foreground)]">{t("roaster")}: {record.roaster}</p>
                 )}
@@ -311,6 +401,7 @@ export default function BeanProfilesPage() {
             </Card>
           ))}
         </div>
+        </>
       )}
     </div>
   );

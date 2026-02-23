@@ -14,31 +14,46 @@ const termIds = [
   "cupping",
   "extraction",
   "extractionYield",
+  "flavorNotes",
   "grindSize",
+  "roasting",
   "tds",
   "underOver",
+  "arabica",
+  "robusta",
+  "geisha",
+  "typica",
+  "bourbon",
+  "caturra",
+  "pacamara",
 ] as const;
 
 type GlossaryEntry = {
   id: string;
   term: string;
+  category: string;
   short: string;
   explanation: string;
   tip: string;
 };
 
 type SearchScope = "all" | "term" | "description";
+type CategoryFilter = "all" | "basics" | "varieties";
 
 export default function GlossaryPage() {
   const t = useTranslations("glossary");
   const [query, setQuery] = useState("");
   const [searchScope, setSearchScope] = useState<SearchScope>("all");
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
 
   const terms = useMemo<GlossaryEntry[]>(
     () =>
       termIds.map((id) => ({
         id,
         term: t(`terms.${id}.term`),
+        category: t.has(`terms.${id}.category`)
+          ? t(`terms.${id}.category`)
+          : t("categoryBasics"),
         short: t(`terms.${id}.short`),
         explanation: t(`terms.${id}.explanation`),
         tip: t(`terms.${id}.tip`),
@@ -48,9 +63,18 @@ export default function GlossaryPage() {
 
   const filtered = useMemo(() => {
     const keyword = query.trim().toLowerCase();
-    if (!keyword) return terms;
+    const withCategory =
+      categoryFilter === "all"
+        ? terms
+        : terms.filter((term) =>
+            categoryFilter === "basics"
+              ? term.category === t("categoryBasics")
+              : term.category === t("categoryVarietiesSpecies")
+          );
 
-    return terms.filter((term) => {
+    if (!keyword) return withCategory;
+
+    return withCategory.filter((term) => {
       if (searchScope === "term") {
         return term.term.toLowerCase().includes(keyword);
       }
@@ -62,7 +86,7 @@ export default function GlossaryPage() {
       const plain = `${term.term} ${term.short} ${term.explanation}`.toLowerCase();
       return plain.includes(keyword);
     });
-  }, [query, searchScope, terms]);
+  }, [query, searchScope, categoryFilter, terms, t]);
 
   return (
     <div className="space-y-8">
@@ -71,7 +95,7 @@ export default function GlossaryPage() {
           {t("title")}
         </h1>
         <p className="text-sm text-[var(--muted-foreground)]">{t("description")}</p>
-        <div className="grid max-w-2xl gap-3 sm:grid-cols-[minmax(0,1fr)_220px]">
+        <div className="grid max-w-4xl gap-3 sm:grid-cols-[minmax(0,1fr)_220px_260px]">
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -90,6 +114,21 @@ export default function GlossaryPage() {
               <option value="all">{t("searchAll")}</option>
               <option value="term">{t("searchTerm")}</option>
               <option value="description">{t("searchDescription")}</option>
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="glossary-category-filter" className="text-xs text-[var(--muted-foreground)]">
+              {t("categoryFilterLabel")}
+            </Label>
+            <select
+              id="glossary-category-filter"
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value as CategoryFilter)}
+              className="flex h-10 w-full rounded-md border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-sm text-[var(--foreground)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+            >
+              <option value="all">{t("categoryAllOption")}</option>
+              <option value="basics">{t("categoryBasics")}</option>
+              <option value="varieties">{t("categoryVarietiesSpecies")}</option>
             </select>
           </div>
         </div>

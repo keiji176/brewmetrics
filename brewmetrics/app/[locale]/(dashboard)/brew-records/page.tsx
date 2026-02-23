@@ -29,6 +29,7 @@ type BrewRecord = {
   id: string;
   user_id: string;
   bean_name: string | null;
+  variety: string | null;
   roaster: string | null;
   grind_size: string | null;
   temperature: number | null;
@@ -42,6 +43,7 @@ type BrewRecord = {
 
 type BrewRecordForm = {
   bean_name: string;
+  variety: string;
   roaster: string;
   grind_size: string;
   temperature: number | null;
@@ -54,6 +56,7 @@ type BrewRecordForm = {
 
 const emptyForm: BrewRecordForm = {
   bean_name: "",
+  variety: "",
   roaster: "",
   grind_size: "",
   temperature: null,
@@ -77,6 +80,10 @@ export default function BrewRecordsPage() {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<BrewRecordForm>(emptyForm);
   const [searchQuery, setSearchQuery] = useState("");
+  const [varietyFilter, setVarietyFilter] = useState("all");
+  const [varietySort, setVarietySort] = useState<"none" | "az" | "za">("none");
+
+  const varietyOptions = ["Geisha", "Typica", "Bourbon", "Caturra", "Pacamara", "SL28"];
 
   const supabase = createClient();
 
@@ -124,6 +131,7 @@ export default function BrewRecordsPage() {
     setEditing(record);
     setForm({
       bean_name: record.bean_name ?? "",
+      variety: record.variety ?? "",
       roaster: record.roaster ?? "",
       grind_size: record.grind_size ?? "",
       temperature: record.temperature,
@@ -144,6 +152,7 @@ export default function BrewRecordsPage() {
 
     const payload = {
       bean_name: form.bean_name || null,
+      variety: form.variety || null,
       roaster: form.roaster || null,
       grind_size: form.grind_size || null,
       temperature: form.temperature != null ? Number(form.temperature) : null,
@@ -237,13 +246,36 @@ export default function BrewRecordsPage() {
 
   const filteredRecords = useMemo(() => {
     const keyword = searchQuery.trim().toLowerCase();
-    if (!keyword) return records;
-    return records.filter((record) => {
-      const beanName = record.bean_name?.toLowerCase() ?? "";
-      const notes = record.notes?.toLowerCase() ?? "";
-      return beanName.includes(keyword) || notes.includes(keyword);
+    let next = records;
+
+    if (varietyFilter !== "all") {
+      next = next.filter((record) => (record.variety ?? "") === varietyFilter);
+    }
+
+    const searched = keyword
+      ? next.filter((record) => {
+          const beanName = record.bean_name?.toLowerCase() ?? "";
+          const variety = record.variety?.toLowerCase() ?? "";
+          const notes = record.notes?.toLowerCase() ?? "";
+          return beanName.includes(keyword) || variety.includes(keyword) || notes.includes(keyword);
+        })
+      : next;
+
+    if (varietySort === "none") return searched;
+
+    return [...searched].sort((a, b) => {
+      const aVariety = a.variety?.toLowerCase() ?? "";
+      const bVariety = b.variety?.toLowerCase() ?? "";
+      const base = aVariety.localeCompare(bVariety);
+      return varietySort === "az" ? base : -base;
     });
-  }, [records, searchQuery]);
+  }, [records, searchQuery, varietyFilter, varietySort]);
+
+  const varietyValues = useMemo(() => {
+    return Array.from(
+      new Set(records.map((record) => record.variety?.trim()).filter((value): value is string => Boolean(value)))
+    ).sort((a, b) => a.localeCompare(b));
+  }, [records]);
 
   return (
     <div className="space-y-8">
@@ -278,6 +310,24 @@ export default function BrewRecordsPage() {
                   }
                   placeholder={t("beanNamePlaceholder")}
                 />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="variety">{t("variety")}</Label>
+                <Input
+                  id="variety"
+                  list="brew-variety-options"
+                  value={form.variety}
+                  onChange={(e) =>
+                    setForm((current) => ({ ...current, variety: e.target.value }))
+                  }
+                  placeholder={t("varietyPlaceholder")}
+                />
+                <datalist id="brew-variety-options">
+                  {varietyOptions.map((variety) => (
+                    <option key={variety} value={variety} />
+                  ))}
+                </datalist>
               </div>
 
               <div className="grid gap-2">
@@ -455,12 +505,45 @@ export default function BrewRecordsPage() {
         </Card>
       </div>
 
-      <div className="max-w-md">
+      <div className="grid max-w-3xl gap-3 sm:grid-cols-[minmax(0,1fr)_220px_220px]">
         <Input
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={t("searchPlaceholder")}
         />
+        <div className="grid gap-1.5">
+          <Label htmlFor="brew-variety-filter" className="text-xs text-[var(--muted-foreground)]">
+            {t("varietyFilterLabel")}
+          </Label>
+          <select
+            id="brew-variety-filter"
+            value={varietyFilter}
+            onChange={(e) => setVarietyFilter(e.target.value)}
+            className="flex h-10 w-full rounded-md border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-sm text-[var(--foreground)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+          >
+            <option value="all">{t("allVarieties")}</option>
+            {varietyValues.map((variety) => (
+              <option key={variety} value={variety}>
+                {variety}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="grid gap-1.5">
+          <Label htmlFor="brew-variety-sort" className="text-xs text-[var(--muted-foreground)]">
+            {t("varietySortLabel")}
+          </Label>
+          <select
+            id="brew-variety-sort"
+            value={varietySort}
+            onChange={(e) => setVarietySort(e.target.value as "none" | "az" | "za")}
+            className="flex h-10 w-full rounded-md border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-sm text-[var(--foreground)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+          >
+            <option value="none">{t("sortNone")}</option>
+            <option value="az">{t("sortAz")}</option>
+            <option value="za">{t("sortZa")}</option>
+          </select>
+        </div>
       </div>
 
       <AICoachPanel context="brew" entries={records} />
@@ -530,6 +613,11 @@ export default function BrewRecordsPage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-1 text-sm">
+                {record.variety && (
+                  <p className="text-[var(--muted-foreground)]">
+                    {t("variety")} : {record.variety}
+                  </p>
+                )}
                 {record.grind_size && (
                   <p className="text-[var(--muted-foreground)]">
                     {t("grind")} : {record.grind_size}

@@ -70,6 +70,8 @@
     "fieldsOptional": "Fields are optional.",
     "beanName": "Bean name",
     "beanNamePlaceholder": "e.g. Ethiopia Yirgacheffe",
+    "variety": "Variety (optional)",
+    "varietyPlaceholder": "e.g. Geisha",
     "roaster": "Roaster",
     "roasterPlaceholder": "e.g. Onibus Coffee",
     "origin": "Origin",
@@ -80,6 +82,12 @@
     "processPlaceholder": "e.g. Washed / Natural / Honey",
     "noRecords": "No bean profiles yet",
     "noRecordsHint": "Add your first bean profile to build your bean library.",
+    "varietyFilterLabel": "Filter by variety",
+    "varietySortLabel": "Sort by variety",
+    "allVarieties": "All varieties",
+    "sortNone": "No sorting",
+    "sortAz": "Variety A-Z",
+    "sortZa": "Variety Z-A",
     "saving": "Saving…",
     "deleteConfirm": "Delete this bean profile?",
     "unnamed": "Unnamed"
@@ -93,6 +101,8 @@
     "fieldsOptional": "Fields are optional.",
     "beanName": "Bean name",
     "beanNamePlaceholder": "e.g. Ethiopia Yirgacheffe",
+    "variety": "Variety (optional)",
+    "varietyPlaceholder": "e.g. Geisha",
     "roaster": "Roaster / Store",
     "roasterPlaceholder": "e.g. Onibus Coffee",
     "grindSize": "Grind size",
@@ -114,6 +124,12 @@
     "saving": "Saving…",
     "deleteConfirm": "Delete this brew record?",
     "searchPlaceholder": "Search by bean name or notes...",
+    "varietyFilterLabel": "Filter by variety",
+    "varietySortLabel": "Sort by variety",
+    "allVarieties": "All varieties",
+    "sortNone": "No sorting",
+    "sortAz": "Variety A-Z",
+    "sortZa": "Variety Z-A",
     "noSearchResults": "No matching brew records were found.",
     "statsTotalBrews": "Total Brews",
     "statsAvgScore": "Avg. Score",
@@ -154,6 +170,10 @@
     "searchAll": "All",
     "searchTerm": "Term Name",
     "searchDescription": "Description",
+    "categoryFilterLabel": "Category",
+    "categoryAllOption": "All categories",
+    "categoryBasics": "Brewing Basics",
+    "categoryVarietiesSpecies": "Varieties & Species",
     "noResults": "No matching terms were found. Try another keyword.",
     "quickTip": "Quick tip",
     "toggleTip": "Toggle tip",
@@ -217,6 +237,69 @@
         "short": "Two common extraction imbalance patterns in brewing.",
         "explanation": "Under-extracted cups can taste sour, salty, or watery. Over-extracted cups can taste bitter, harsh, or drying. Adjusting grind, time, and temperature helps rebalance.",
         "tip": "Sour-thin often needs more extraction; bitter-dry often needs less."
+      },
+      "roasting": {
+        "term": "Roasting",
+        "category": "Brewing Basics",
+        "short": "The process of heating green coffee beans to develop coffee flavor and aroma.",
+        "explanation": "Roasting transforms green beans through controlled heat and time. As the roast progresses, flavor moves from bright and acidic to sweeter, then darker and more bitter. This is why coffees are commonly grouped into light, medium, and dark roast levels.",
+        "tip": "Roast level has a major impact on acidity, sweetness, body, and bitterness."
+      },
+      "flavorNotes": {
+        "term": "Flavor Notes",
+        "category": "Brewing Basics",
+        "short": "Words used to describe coffee aroma and taste by comparing them to familiar foods.",
+        "explanation": "Flavor notes are sensory descriptors such as berry, citrus, nuts, chocolate, or floral tones. They help communicate what a coffee tastes and smells like without adding those ingredients. Notes can change depending on roast level, brewing method, and extraction quality.",
+        "tip": "Use flavor notes as a guide, not a strict rule—your perception can differ."
+      },
+      "arabica": {
+        "term": "Arabica",
+        "category": "Varieties & Species",
+        "short": "The dominant coffee species worldwide, known for balanced sweetness, acidity, and complex aroma.",
+        "explanation": "Arabica accounts for roughly 60–70% of global coffee production. It is generally more delicate and climate-sensitive than Robusta, which makes cultivation harder. Most specialty coffees belong to Arabica because of its nuanced and often floral or fruity flavor profile.",
+        "tip": "Many famous varieties, including Geisha and Typica, belong to Arabica."
+      },
+      "robusta": {
+        "term": "Robusta (Canephora)",
+        "category": "Varieties & Species",
+        "short": "A hardy coffee species with strong bitterness, roasty character, and high caffeine.",
+        "explanation": "Robusta (Coffea canephora) is the second most-produced coffee species after Arabica. It resists pests better and grows well in lower altitudes, making it easier to cultivate. It often has heavier body, stronger bitterness, and around twice the caffeine of Arabica, so it is common in espresso blends and instant coffee.",
+        "tip": "Robusta can add crema, strength, and punch to espresso blends."
+      },
+      "geisha": {
+        "term": "Geisha",
+        "category": "Varieties & Species",
+        "short": "A premium Arabica variety known for floral aroma and citrus-like acidity.",
+        "explanation": "Geisha is celebrated for jasmine-like florals, tea-like clarity, and elegant citrus notes. It often scores highly in competitions and can be expensive due to limited yield and high demand. When roasted and brewed carefully, it can show exceptional complexity.",
+        "tip": "Use gentle brewing and lighter roast styles to preserve Geisha’s delicate aromatics."
+      },
+      "typica": {
+        "term": "Typica",
+        "category": "Varieties & Species",
+        "short": "One of the oldest Arabica lineages, valued for clean cup quality.",
+        "explanation": "Typica is a historic Arabica variety group that influenced many later cultivars. It is known for clarity and refined sweetness, but it tends to be lower-yield and more disease-sensitive. That combination makes high-quality Typica coffees relatively rare.",
+        "tip": "Typica is foundational in coffee history and breeding."
+      },
+      "bourbon": {
+        "term": "Bourbon",
+        "category": "Varieties & Species",
+        "short": "An Arabica variety descended from Typica, often sweet and rounded in cup profile.",
+        "explanation": "Bourbon is widely appreciated for rich sweetness, balanced acidity, and full flavor. Compared with Typica, it can show different plant and bean characteristics depending on region and mutation. Many high-quality Latin American coffees include Bourbon lineage.",
+        "tip": "Bourbon lots often show caramel-like sweetness and smooth texture."
+      },
+      "caturra": {
+        "term": "Caturra",
+        "category": "Varieties & Species",
+        "short": "A natural mutation of Bourbon with compact plant size and productive growth.",
+        "explanation": "Caturra became popular because its shorter tree height can improve farm management and yield. In cup quality, it can present bright acidity and crisp character depending on terroir and processing. It is widely cultivated in Latin America.",
+        "tip": "Lower tree height can make harvesting and farm maintenance easier."
+      },
+      "pacamara": {
+        "term": "Pacamara",
+        "category": "Varieties & Species",
+        "short": "A hybrid of Pacas and Maragogipe, famous for very large beans and complex flavor.",
+        "explanation": "Pacamara is known for oversized bean size and distinctive cup profiles, often combining vivid acidity with heavy body and layered aromatics. It is grown notably in Central America and can taste very expressive when processed and roasted well.",
+        "tip": "Pacamara can be bold and complex—great for cupping and experimental brews."
       }
     }
   },

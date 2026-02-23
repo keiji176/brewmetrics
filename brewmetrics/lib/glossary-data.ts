@@ -1,6 +1,7 @@
 export interface GlossaryTerm {
   id: string;
   term: string;
+  category?: string;
   short: string;
   explanation: string;
   tip?: string;

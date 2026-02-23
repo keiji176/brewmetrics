@@ -31,9 +31,16 @@ export function GlossaryCard({
     >
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="text-lg font-semibold tracking-tight text-[var(--gray-dark)]">
-            {term.term}
-          </h3>
+          <div className="space-y-1">
+            {term.category && (
+              <span className="inline-flex rounded-full bg-[var(--accent)] px-2 py-0.5 text-[11px] font-medium text-[var(--primary)]">
+                {term.category}
+              </span>
+            )}
+            <h3 className="text-lg font-semibold tracking-tight text-[var(--gray-dark)]">
+              {term.term}
+            </h3>
+          </div>
           {term.tip && (
             <button
               type="button"

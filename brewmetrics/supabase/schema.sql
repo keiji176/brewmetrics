@@ -94,12 +94,15 @@ create table if not exists public.bean_profiles (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users (id) on delete cascade not null,
   bean_name text,
+  variety text,
   roaster text,
   origin text,
   roast_level text,
   process text,
   created_at timestamptz default now() not null
 );
+
+alter table public.bean_profiles add column if not exists variety text;
 
 alter table public.bean_profiles enable row level security;
 
@@ -131,6 +134,7 @@ create table if not exists public.brew_records (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users (id) on delete cascade not null,
   bean_name text,
+  variety text,
   roaster text,
   grind_size text,
   temperature numeric,
@@ -141,6 +145,8 @@ create table if not exists public.brew_records (
   notes text,
   created_at timestamptz default now() not null
 );
+
+alter table public.brew_records add column if not exists variety text;
 
 alter table public.brew_records enable row level security;
 

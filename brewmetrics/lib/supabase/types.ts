@@ -46,6 +46,7 @@ export interface Database {
           id: string;
           user_id: string;
           bean_name: string | null;
+          variety: string | null;
           roaster: string | null;
           origin: string | null;
           roast_level: string | null;
@@ -56,6 +57,7 @@ export interface Database {
           id?: string;
           user_id: string;
           bean_name?: string | null;
+          variety?: string | null;
           roaster?: string | null;
           origin?: string | null;
           roast_level?: string | null;
@@ -66,6 +68,7 @@ export interface Database {
           id?: string;
           user_id?: string;
           bean_name?: string | null;
+          variety?: string | null;
           roaster?: string | null;
           origin?: string | null;
           roast_level?: string | null;
