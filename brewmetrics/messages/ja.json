@@ -151,7 +151,7 @@
     "title": "Brewing Digital Twin（抽出シミュレーション）",
     "description": "インタラクティブな抽出シミュレーション — 抽出レシピを調整し、品質スコアをリアルタイムで確認できます。",
     "parameters": "パラメータ",
-    "parametersDescription": "湯温 180–230°C · 挽き目 5段階 · 抽出 15–40秒",
+    "parametersDescription": "湯温 80–100°C · 挽き目 5段階 · 抽出 60–300秒",
     "temperature": "Water Temperature（湯温）",
     "temperatureUnit": "°C",
     "grindSize": "挽き目",
@@ -177,7 +177,6 @@
     "scoreFeedbackHigh": "非常に高い再現性が期待できます。豆のポテンシャルを最大限に引き出した、理想的な抽出になるでしょう。",
     "scoreFeedbackMid": "良好な抽出が期待できます。少しの微調整（湯温や挽き目）で、さらにクリアな味わいになる可能性があります。",
     "scoreFeedbackLow": "過抽出（渋み）や未抽出（酸味が強すぎる）のリスクがあります。抽出レシピ（湯温や粉量など）のバランスを見直すことをおすすめします。",
-    "formula": "数式: 100 − |205−T|×0.3 − |3−G|×3 − |28−E|×0.8",
     "quality": "品質"
   },
   "gearGuide": {

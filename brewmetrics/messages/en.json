@@ -151,7 +151,7 @@
     "title": "Brewing Digital Twin",
     "description": "Interactive brewing simulation — adjust recipe parameters and see quality score in real time.",
     "parameters": "Parameters",
-    "parametersDescription": "Water temperature 180–230°C · 5-step grind scale · Extraction 15–40s",
+    "parametersDescription": "Water temperature 80–100°C · 5-step grind scale · Extraction 60–300s",
     "temperature": "Water Temperature",
     "temperatureUnit": "°C",
     "grindSize": "Grind Size",
@@ -177,7 +177,6 @@
     "scoreFeedbackHigh": "Very high reproducibility is expected. This recipe is likely to unlock the bean's full potential with an ideal extraction balance.",
     "scoreFeedbackMid": "A good extraction is expected. Small adjustments (water temperature or grind size) may improve clarity even further.",
     "scoreFeedbackLow": "There is a risk of over-extraction (harshness) or under-extraction (overly sharp acidity). Review your brewing recipe balance.",
-    "formula": "Formula: 100 − |205−T|×0.3 − |3−G|×3 − |28−E|×0.8",
     "quality": "Quality"
   },
   "gearGuide": {

@@ -11,14 +11,19 @@ import { ResponsiveContainer, RadialBarChart, RadialBar, Legend } from "recharts
 import { useTranslations } from "next-intl";
 
 function computeScore(temperature: number, grindSize: number, extractionTime: number): number {
+  const idealTemp = 92;
+  const idealGrind = 3;
+  const idealTime = 150;
+
+  const tempPenalty = Math.pow(temperature - idealTemp, 2) * 0.5;
+  const grindPenalty = Math.pow(grindSize - idealGrind, 2) * 5.0;
+  const timePenalty = Math.pow(extractionTime - idealTime, 2) * 0.005;
+
   return Math.max(
     0,
     Math.min(
       100,
-      100 -
-        Math.abs(205 - temperature) * 0.3 -
-        Math.abs(3 - grindSize) * 3 -
-        Math.abs(28 - extractionTime) * 0.8
+      100 - (tempPenalty + grindPenalty + timePenalty)
     )
   );
 }
@@ -51,9 +56,9 @@ export default function DigitalTwinPage() {
   const t = useTranslations("digitalTwin");
   const supabase = createClient();
 
-  const [temperature, setTemperature] = useState(205);
+  const [temperature, setTemperature] = useState(92);
   const [manualGrindSize, setManualGrindSize] = useState<GrindSize>(GrindSize.MEDIUM);
-  const [extractionTime, setExtractionTime] = useState(28);
+  const [extractionTime, setExtractionTime] = useState(150);
   const [userId, setUserId] = useState<string | null>(null);
   const [calibrations, setCalibrations] = useState<GrinderCalibrationRow[]>([]);
   const [selectedCalibrationId, setSelectedCalibrationId] = useState("");
@@ -159,8 +164,9 @@ export default function DigitalTwinPage() {
               </div>
               <input
                 type="range"
-                min={180}
-                max={230}
+                min={80}
+                max={100}
+                step={1}
                 value={temperature}
                 onChange={(e) => setTemperature(Number(e.target.value))}
                 className="h-2 w-full appearance-none rounded-full bg-[var(--muted)] [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--primary)]"
@@ -232,8 +238,9 @@ export default function DigitalTwinPage() {
               </div>
               <input
                 type="range"
-                min={15}
-                max={40}
+                min={60}
+                max={300}
+                step={5}
                 value={extractionTime}
                 onChange={(e) => setExtractionTime(Number(e.target.value))}
                 className="h-2 w-full appearance-none rounded-full bg-[var(--muted)] [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--primary)]"
