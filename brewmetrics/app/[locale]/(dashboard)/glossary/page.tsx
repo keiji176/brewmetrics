@@ -26,6 +26,7 @@ const termIds = [
   "bourbon",
   "caturra",
   "pacamara",
+  "simulationScoringFormula",
 ] as const;
 
 type GlossaryEntry = {
@@ -38,7 +39,7 @@ type GlossaryEntry = {
 };
 
 type SearchScope = "all" | "term" | "description";
-type CategoryFilter = "all" | "basics" | "varieties";
+type CategoryFilter = "all" | "basics" | "varieties" | "simulation";
 
 export default function GlossaryPage() {
   const t = useTranslations("glossary");
@@ -69,7 +70,9 @@ export default function GlossaryPage() {
         : terms.filter((term) =>
             categoryFilter === "basics"
               ? term.category === t("categoryBasics")
-              : term.category === t("categoryVarietiesSpecies")
+              : categoryFilter === "varieties"
+                ? term.category === t("categoryVarietiesSpecies")
+                : term.category === t("categorySimulation")
           );
 
     if (!keyword) return withCategory;
@@ -131,6 +134,7 @@ export default function GlossaryPage() {
               <option value="all">{t("categoryAllOption")}</option>
               <option value="basics">{t("categoryBasics")}</option>
               <option value="varieties">{t("categoryVarietiesSpecies")}</option>
+              <option value="simulation">{t("categorySimulation")}</option>
             </select>
           </div>
         </div>

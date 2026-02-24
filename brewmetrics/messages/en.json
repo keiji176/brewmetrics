@@ -154,6 +154,13 @@
     "parametersDescription": "Water temperature 80–100°C · 5-step grind scale · Extraction 60–300s",
     "temperature": "Water Temperature",
     "temperatureUnit": "°C",
+    "roastLevel": "Roast Level",
+    "roastLight": "Light",
+    "roastMediumLight": "Medium-Light",
+    "roastMedium": "Medium",
+    "roastMediumDark": "Medium-Dark",
+    "roastDark": "Dark",
+    "recommendedRange": "Recommended range for this roast: Water temperature {tempMin}–{tempMax}°C / Extraction {timeMin}–{timeMax}s",
     "grindSize": "Grind Size",
     "grindRange": "1–5",
     "grindFine": "Fine",
@@ -195,6 +202,7 @@
     "categoryAllOption": "All categories",
     "categoryBasics": "Brewing Basics",
     "categoryVarietiesSpecies": "Varieties & Species",
+    "categorySimulation": "Simulation",
     "noResults": "No matching terms were found. Try another keyword.",
     "quickTip": "Quick tip",
     "toggleTip": "Toggle tip",
@@ -321,6 +329,13 @@
         "short": "A hybrid of Pacas and Maragogipe, famous for very large beans and complex flavor.",
         "explanation": "Pacamara is known for oversized bean size and distinctive cup profiles, often combining vivid acidity with heavy body and layered aromatics. It is grown notably in Central America and can taste very expressive when processed and roasted well.",
         "tip": "Pacamara can be bold and complex—great for cupping and experimental brews."
+      },
+      "simulationScoringFormula": {
+        "term": "Simulation Scoring Formula",
+        "category": "Simulation",
+        "short": "A deduction-based algorithm used by Digital Twin to estimate brew reproducibility.",
+        "explanation": "The Digital Twin uses a roast-level-aware target recipe and deducts points as your settings move away from that target.\n\nBase formula:\nScore = 100 - ( 0.5 × (T - T_ideal)^2 + 5.0 × (G - G_ideal)^2 + 0.005 × (t - t_ideal)^2 )\n\nVariable definitions:\n- T, G, t: your selected water temperature, grind level, and extraction time\n- T_ideal, G_ideal, t_ideal: ideal targets defined for each roast level\n- 0.5, 5.0, 0.005: weighting constants. Grind deviation is intentionally weighted the most.",
+        "tip": "Lighter roasts target hotter water and finer grinding, while darker roasts target cooler water and coarser grinding."
       }
     }
   },

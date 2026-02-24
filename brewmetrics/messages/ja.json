@@ -154,6 +154,13 @@
     "parametersDescription": "湯温 80–100°C · 挽き目 5段階 · 抽出 60–300秒",
     "temperature": "Water Temperature（湯温）",
     "temperatureUnit": "°C",
+    "roastLevel": "焙煎度 (Roast Level)",
+    "roastLight": "浅煎り (Light)",
+    "roastMediumLight": "中浅煎り (Medium-Light)",
+    "roastMedium": "中煎り (Medium)",
+    "roastMediumDark": "中深煎り (Medium-Dark)",
+    "roastDark": "深煎り (Dark)",
+    "recommendedRange": "この焙煎度の推奨レンジ: 湯温 {tempMin}–{tempMax}°C / 抽出 {timeMin}–{timeMax}秒",
     "grindSize": "挽き目",
     "grindRange": "1–5",
     "grindFine": "細挽き (Fine)",
@@ -195,6 +202,7 @@
     "categoryAllOption": "全カテゴリ",
     "categoryBasics": "抽出の基礎",
     "categoryVarietiesSpecies": "品種・原種 (Varieties & Species)",
+    "categorySimulation": "シミュレーション",
     "noResults": "該当する用語が見つかりませんでした。別のキーワードをお試しください。",
     "quickTip": "ワンポイント",
     "toggleTip": "ワンポイントを表示",
@@ -321,6 +329,13 @@
         "short": "パーカスとマラゴジッペの人工交配で生まれた、大粒で個性的な品種です。",
         "explanation": "パカマラは豆粒が大きく、複雑で重厚な風味やユニークな酸味を示すことで知られます。中米を中心に栽培され、処理や焙煎によって個性が強く現れやすい品種です。カッピングでも印象的なフレーバーを示すことがあります。",
         "tip": "個性が強いので、抽出レシピを少しずつ調整すると特徴を引き出しやすいです。"
+      },
+      "simulationScoringFormula": {
+        "term": "シミュレーション品質スコアの計算式（Simulation Scoring Formula）",
+        "category": "シミュレーション",
+        "short": "デジタルツインが抽出の再現性を評価するための減点方式アルゴリズムです。",
+        "explanation": "デジタルツインは、焙煎度ごとの理想レシピを基準に、入力値が離れるほど点数を減点する方式を採用しています。\n\n基本計算式:\nScore = 100 - ( 0.5 × (T - T_ideal)^2 + 5.0 × (G - G_ideal)^2 + 0.005 × (t - t_ideal)^2 )\n\n各定数・変数の意味:\n・T, G, t: ユーザーが入力した湯温・挽き目・抽出時間\n・T_ideal, G_ideal, t_ideal: 焙煎度ごとに定義された理想の湯温・挽き目・抽出時間\n・0.5, 5.0, 0.005: 各項目の重み。挽き目のズレが最も大きく影響するよう設計されています。",
+        "tip": "浅煎りほど高温・細挽き寄り、深煎りほど低温・粗挽き寄りの理想値になります。"
       }
     }
   },

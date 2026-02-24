@@ -10,10 +10,35 @@ import { Label } from "@/components/ui/label";
 import { ResponsiveContainer, RadialBarChart, RadialBar, Legend } from "recharts";
 import { useTranslations } from "next-intl";
 
-function computeScore(temperature: number, grindSize: number, extractionTime: number): number {
-  const idealTemp = 92;
-  const idealGrind = 3;
-  const idealTime = 150;
+type RoastLevel = 1 | 2 | 3 | 4 | 5;
+
+type RoastTarget = {
+  temp: number;
+  grind: number;
+  time: number;
+  tempMin: number;
+  tempMax: number;
+  timeMin: number;
+  timeMax: number;
+};
+
+const roastTargets: Record<RoastLevel, RoastTarget> = {
+  1: { temp: 94, grind: 2.0, time: 165, tempMin: 92, tempMax: 96, timeMin: 150, timeMax: 190 },
+  2: { temp: 92, grind: 2.5, time: 155, tempMin: 90, tempMax: 94, timeMin: 145, timeMax: 175 },
+  3: { temp: 90, grind: 3.0, time: 150, tempMin: 88, tempMax: 92, timeMin: 135, timeMax: 165 },
+  4: { temp: 86, grind: 3.5, time: 140, tempMin: 84, tempMax: 88, timeMin: 125, timeMax: 155 },
+  5: { temp: 83, grind: 4.0, time: 130, tempMin: 82, tempMax: 86, timeMin: 115, timeMax: 145 },
+};
+
+function computeScore(
+  temperature: number,
+  grindSize: number,
+  extractionTime: number,
+  roastLevel: RoastLevel
+): number {
+  const idealTemp = roastTargets[roastLevel].temp;
+  const idealGrind = roastTargets[roastLevel].grind;
+  const idealTime = roastTargets[roastLevel].time;
 
   const tempPenalty = Math.pow(temperature - idealTemp, 2) * 0.5;
   const grindPenalty = Math.pow(grindSize - idealGrind, 2) * 5.0;
@@ -59,6 +84,7 @@ export default function DigitalTwinPage() {
   const [temperature, setTemperature] = useState(92);
   const [manualGrindSize, setManualGrindSize] = useState<GrindSize>(GrindSize.MEDIUM);
   const [extractionTime, setExtractionTime] = useState(150);
+  const [roastLevel, setRoastLevel] = useState<RoastLevel>(3);
   const [userId, setUserId] = useState<string | null>(null);
   const [calibrations, setCalibrations] = useState<GrinderCalibrationRow[]>([]);
   const [selectedCalibrationId, setSelectedCalibrationId] = useState("");
@@ -100,9 +126,11 @@ export default function DigitalTwinPage() {
   const effectiveGrindValue = grindScale.find((item) => item.key === effectiveGrindSize)?.value ?? 3;
 
   const score = useMemo(
-    () => computeScore(temperature, effectiveGrindValue, extractionTime),
-    [temperature, effectiveGrindValue, extractionTime]
+    () => computeScore(temperature, effectiveGrindValue, extractionTime, roastLevel),
+    [temperature, effectiveGrindValue, extractionTime, roastLevel]
   );
+
+  const selectedRoastTarget = roastTargets[roastLevel];
 
   const scoreFeedbackKey =
     score >= 90 ? "scoreFeedbackHigh" : score >= 70 ? "scoreFeedbackMid" : "scoreFeedbackLow";
@@ -141,6 +169,14 @@ export default function DigitalTwinPage() {
     [GrindSize.COARSE]: t("grindCoarse"),
   };
 
+  const roastLabelMap: Record<RoastLevel, string> = {
+    1: t("roastLight"),
+    2: t("roastMediumLight"),
+    3: t("roastMedium"),
+    4: t("roastMediumDark"),
+    5: t("roastDark"),
+  };
+
   return (
     <div className="space-y-8">
       <div>
@@ -157,6 +193,32 @@ export default function DigitalTwinPage() {
             <CardDescription>{t("parametersDescription")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <Label>{t("roastLevel")}</Label>
+                <span className="font-medium text-[var(--foreground)]">{roastLabelMap[roastLevel]}</span>
+              </div>
+              <select
+                value={roastLevel}
+                onChange={(e) => setRoastLevel(Number(e.target.value) as RoastLevel)}
+                className="flex h-10 w-full rounded-md border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-sm text-[var(--foreground)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+              >
+                <option value={1}>{roastLabelMap[1]}</option>
+                <option value={2}>{roastLabelMap[2]}</option>
+                <option value={3}>{roastLabelMap[3]}</option>
+                <option value={4}>{roastLabelMap[4]}</option>
+                <option value={5}>{roastLabelMap[5]}</option>
+              </select>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                {t("recommendedRange", {
+                  tempMin: selectedRoastTarget.tempMin,
+                  tempMax: selectedRoastTarget.tempMax,
+                  timeMin: selectedRoastTarget.timeMin,
+                  timeMax: selectedRoastTarget.timeMax,
+                })}
+              </p>
+            </div>
+
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <Label>{t("temperature")} ({t("temperatureUnit")})</Label>
