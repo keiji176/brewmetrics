@@ -7,6 +7,7 @@ import { KpiCards } from "@/components/dashboard/KpiCards";
 import { QualityRadarChart } from "@/components/dashboard/QualityRadarChart";
 import { QualityTrendChart } from "@/components/dashboard/QualityTrendChart";
 import { AdvancedAnalyticsScatter } from "@/components/dashboard/AdvancedAnalyticsScatter";
+import { WelcomeCard } from "@/components/dashboard/WelcomeCard";
 import { AICoachPanel } from "@/components/ai-coach/AICoachPanel";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -134,6 +135,8 @@ export default function DashboardPage() {
         </h1>
         <p className="mt-1 text-sm text-[var(--muted-foreground)]">{t("description")}</p>
       </div>
+
+      <WelcomeCard />
 
       <KpiCards
         totalRecords={totalRecords}
