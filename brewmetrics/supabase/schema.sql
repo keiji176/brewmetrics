@@ -172,3 +172,42 @@ create policy "Users can delete own brew_records"
 
 create index if not exists brew_records_user_id_created_at_idx
   on public.brew_records (user_id, created_at desc);
+
+-- Grinder calibration — user-defined click mapping for grind size estimation
+create table if not exists public.grinder_calibrations (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users (id) on delete cascade not null,
+  grinder_name text not null,
+  fine_click integer not null,
+  medium_fine_click integer not null,
+  medium_click integer not null,
+  medium_coarse_click integer not null,
+  coarse_click integer not null,
+  created_at timestamptz default now() not null,
+  updated_at timestamptz default now() not null
+);
+
+alter table public.grinder_calibrations enable row level security;
+
+drop policy if exists "Users can read own grinder_calibrations" on public.grinder_calibrations;
+create policy "Users can read own grinder_calibrations"
+  on public.grinder_calibrations for select
+  using (auth.uid() = user_id);
+
+drop policy if exists "Users can insert own grinder_calibrations" on public.grinder_calibrations;
+create policy "Users can insert own grinder_calibrations"
+  on public.grinder_calibrations for insert
+  with check (auth.uid() = user_id);
+
+drop policy if exists "Users can update own grinder_calibrations" on public.grinder_calibrations;
+create policy "Users can update own grinder_calibrations"
+  on public.grinder_calibrations for update
+  using (auth.uid() = user_id);
+
+drop policy if exists "Users can delete own grinder_calibrations" on public.grinder_calibrations;
+create policy "Users can delete own grinder_calibrations"
+  on public.grinder_calibrations for delete
+  using (auth.uid() = user_id);
+
+create index if not exists grinder_calibrations_user_id_idx
+  on public.grinder_calibrations (user_id, created_at desc);
