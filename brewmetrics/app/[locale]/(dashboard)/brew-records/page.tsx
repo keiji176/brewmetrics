@@ -505,13 +505,15 @@ export default function BrewRecordsPage() {
         </Card>
       </div>
 
-      <div className="grid max-w-3xl gap-3 sm:grid-cols-[minmax(0,1fr)_220px_220px]">
-        <Input
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={t("searchPlaceholder")}
-        />
-        <div className="grid gap-1.5">
+      <div className="flex w-full max-w-4xl flex-col gap-4 md:flex-row md:items-end">
+        <div className="w-full md:flex-1">
+          <Input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t("searchPlaceholder")}
+          />
+        </div>
+        <div className="grid w-full gap-1.5 md:w-56">
           <Label htmlFor="brew-variety-filter" className="text-xs text-[var(--muted-foreground)]">
             {t("varietyFilterLabel")}
           </Label>
@@ -529,7 +531,7 @@ export default function BrewRecordsPage() {
             ))}
           </select>
         </div>
-        <div className="grid gap-1.5">
+        <div className="grid w-full gap-1.5 md:w-56">
           <Label htmlFor="brew-variety-sort" className="text-xs text-[var(--muted-foreground)]">
             {t("varietySortLabel")}
           </Label>

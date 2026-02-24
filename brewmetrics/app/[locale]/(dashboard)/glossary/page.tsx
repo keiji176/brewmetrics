@@ -95,13 +95,15 @@ export default function GlossaryPage() {
           {t("title")}
         </h1>
         <p className="text-sm text-[var(--muted-foreground)]">{t("description")}</p>
-        <div className="grid max-w-4xl gap-3 sm:grid-cols-[minmax(0,1fr)_220px_260px]">
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={t("searchPlaceholder")}
-          />
-          <div className="space-y-1.5">
+        <div className="flex w-full max-w-5xl flex-col gap-4 md:flex-row md:items-end">
+          <div className="w-full md:flex-1">
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t("searchPlaceholder")}
+            />
+          </div>
+          <div className="w-full space-y-1.5 md:w-56">
             <Label htmlFor="glossary-search-scope" className="text-xs text-[var(--muted-foreground)]">
               {t("searchScopeLabel")}
             </Label>
@@ -116,7 +118,7 @@ export default function GlossaryPage() {
               <option value="description">{t("searchDescription")}</option>
             </select>
           </div>
-          <div className="space-y-1.5">
+          <div className="w-full space-y-1.5 md:w-64">
             <Label htmlFor="glossary-category-filter" className="text-xs text-[var(--muted-foreground)]">
               {t("categoryFilterLabel")}
             </Label>

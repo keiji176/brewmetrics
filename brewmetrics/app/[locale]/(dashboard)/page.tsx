@@ -136,7 +136,12 @@ export default function DashboardPage() {
         <p className="mt-1 text-sm text-[var(--muted-foreground)]">{t("description")}</p>
       </div>
 
-      <WelcomeCard />
+      <WelcomeCard
+        title={t("welcomeTitle")}
+        line1={t("welcomeLine1")}
+        line2={t("welcomeLine2")}
+        cta={t("welcomeCta")}
+      />
 
       <KpiCards
         totalRecords={totalRecords}

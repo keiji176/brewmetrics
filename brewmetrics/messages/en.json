@@ -57,6 +57,10 @@
     "advancedAnalytics": "Advanced Analytics",
     "scatterDescription": "Roast temperature vs cupping score — stable temperatures typically improve quality",
     "scatterEmpty": "Add roasting records with temperature and cupping score to see the correlation.",
+    "welcomeTitle": "Turn great coffee from chance into consistency ☕",
+    "welcomeLine1": "Record your brews and taste notes, then improve with AI.",
+    "welcomeLine2": "Use data to reproduce your best cup.",
+    "welcomeCta": "→ Add your first bean",
     "target": "Target",
     "score": "Score",
     "batch": "Batch"
