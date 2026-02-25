@@ -31,6 +31,18 @@ type CustomGearCard = {
   created_at: string;
 };
 
+type GearCardItem = {
+  key: string;
+  gearId: string;
+  isCustom: boolean;
+  customId?: string;
+  customCategory?: string;
+  category: string;
+  name: string;
+  bestFor: string;
+  note: string;
+};
+
 export default function GearGuidePage() {
   const t = useTranslations("gearGuide");
   const tSettings = useTranslations("settings");
@@ -187,7 +199,7 @@ export default function GearGuidePage() {
     [t]
   );
 
-  const cardItems = useMemo(() => {
+  const cardItems = useMemo<GearCardItem[]>(() => {
     const catalogItems = items.map((item) => ({
       key: item.id,
       gearId: item.id,
