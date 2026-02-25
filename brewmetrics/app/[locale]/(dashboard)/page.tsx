@@ -10,8 +10,10 @@ import { AdvancedAnalyticsScatter } from "@/components/dashboard/AdvancedAnalyti
 import { AICoachPanel } from "@/components/ai-coach/AICoachPanel";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
+
+const DASHBOARD_WELCOME_DISMISSED_KEY = "brewmetrics.dashboard.welcomeDismissed";
 
 function useRoastingRecords() {
   const [records, setRecords] = useState<RoastingRecordRow[]>([]);
@@ -51,6 +53,19 @@ function useRoastingRecords() {
 export default function DashboardPage() {
   const t = useTranslations("dashboard");
   const { records, hasBeans, loading, error } = useRoastingRecords();
+  const [welcomeDismissed, setWelcomeDismissed] = useState(false);
+
+  useEffect(() => {
+    const dismissed = localStorage.getItem(DASHBOARD_WELCOME_DISMISSED_KEY) === "1";
+    if (dismissed) {
+      setWelcomeDismissed(true);
+    }
+  }, []);
+
+  function handleDismissWelcome() {
+    setWelcomeDismissed(true);
+    localStorage.setItem(DASHBOARD_WELCOME_DISMISSED_KEY, "1");
+  }
 
   const totalRecords = records.length;
   const scores = records.map((r) => r.cupping_score).filter((s): s is number => s != null);
@@ -133,11 +148,6 @@ export default function DashboardPage() {
     );
   }
 
-  const ctaHref = hasBeans ? "/brew-records" : "/bean-profiles";
-  const ctaTitle = hasBeans ? t("ctaTitleHasBeans") : t("ctaTitleNoBeans");
-  const ctaDescription = hasBeans ? t("ctaDescHasBeans") : t("ctaDescNoBeans");
-  const ctaButton = hasBeans ? t("ctaButtonRecord") : t("ctaButtonRegister");
-
   return (
     <div className="space-y-8">
       <div>
@@ -147,24 +157,51 @@ export default function DashboardPage() {
         <p className="mt-1 text-sm text-[var(--muted-foreground)]">{t("description")}</p>
       </div>
 
-      <section className="min-h-[42vh] rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 sm:p-8">
-        <div className="mx-auto flex h-full max-w-3xl flex-col justify-center gap-5">
-          <h2 className="text-2xl font-semibold tracking-tight text-[var(--gray-dark)] sm:text-3xl">
-            {ctaTitle}
-          </h2>
-          <p className="text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base">
-            {ctaDescription}
-          </p>
-          <div>
-            <Link href={ctaHref}>
-              <Button size="lg" className="h-12 px-8 text-base font-semibold">
-                {ctaButton}
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
+      {!hasBeans && !welcomeDismissed && (
+        <section className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold tracking-tight text-[var(--gray-dark)]">
+                {t("welcomeBannerTitle")}
+              </h2>
+              <p className="text-sm leading-relaxed text-[var(--muted-foreground)]">
+                {t("welcomeBannerDescription")}
+              </p>
+
+              <ul className="grid gap-2 text-sm text-[var(--foreground)] md:grid-cols-3">
+                <li className="rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2">
+                  {t("welcomeStep1")}
+                </li>
+                <li className="rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2">
+                  {t("welcomeStep2")}
+                </li>
+                <li className="rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2">
+                  {t("welcomeStep3")}
+                </li>
+              </ul>
+
+              <div>
+                <Link href="/bean-profiles">
+                  <Button>
+                    {t("welcomeBannerCta")}
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={handleDismissWelcome}
+              aria-label={t("welcomeBannerDismiss")}
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className="space-y-8 pt-8">
         <KpiCards
