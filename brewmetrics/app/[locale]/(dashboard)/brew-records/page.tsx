@@ -293,13 +293,13 @@ export default function BrewRecordsPage() {
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
+        <DialogContent className="flex max-h-[90vh] flex-col overflow-hidden p-0 sm:max-w-2xl">
+          <DialogHeader className="sticky top-0 z-10 border-b bg-[var(--card)] px-6 pt-6 pb-4">
             <DialogTitle>{editing ? t("editRecord") : t("newRecord")}</DialogTitle>
             <DialogDescription>{t("fieldsOptional")}</DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit}>
-            <div className="grid gap-4 py-4">
+          <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+            <div className="grid flex-1 gap-4 overflow-y-auto px-6 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="bean_name">{t("beanName")}</Label>
                 <Input
@@ -459,7 +459,7 @@ export default function BrewRecordsPage() {
               </div>
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="sticky bottom-0 z-10 border-t bg-[var(--card)] px-6 py-4">
               <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
                 {tCommon("cancel")}
               </Button>
