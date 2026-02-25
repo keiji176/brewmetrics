@@ -7,13 +7,15 @@ import { KpiCards } from "@/components/dashboard/KpiCards";
 import { QualityRadarChart } from "@/components/dashboard/QualityRadarChart";
 import { QualityTrendChart } from "@/components/dashboard/QualityTrendChart";
 import { AdvancedAnalyticsScatter } from "@/components/dashboard/AdvancedAnalyticsScatter";
-import { WelcomeCard } from "@/components/dashboard/WelcomeCard";
 import { AICoachPanel } from "@/components/ai-coach/AICoachPanel";
-import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 function useRoastingRecords() {
   const [records, setRecords] = useState<RoastingRecordRow[]>([]);
+  const [hasBeans, setHasBeans] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
@@ -24,27 +26,31 @@ function useRoastingRecords() {
       setLoading(false);
       return;
     }
-    supabase
-      .from("roasting_records")
-      .select("*")
-      .order("created_at", { ascending: true })
-      .then(({ data, error: e }) => {
-        setLoading(false);
-        if (e) {
-          setError(e.message);
-          return;
-        }
-        setRecords((data as RoastingRecordRow[]) ?? []);
-      });
+    Promise.all([
+      supabase
+        .from("roasting_records")
+        .select("*")
+        .order("created_at", { ascending: true }),
+      supabase.from("bean_profiles").select("id").limit(1),
+    ]).then(([roastingRes, beanRes]) => {
+      setLoading(false);
+
+      if (roastingRes.error) {
+        setError(roastingRes.error.message);
+        return;
+      }
+
+      setRecords((roastingRes.data as RoastingRecordRow[]) ?? []);
+      setHasBeans((beanRes.data?.length ?? 0) > 0);
+    });
   }, [supabase]);
 
-  return { records, loading, error };
+  return { records, hasBeans, loading, error };
 }
 
 export default function DashboardPage() {
   const t = useTranslations("dashboard");
-  const tCommon = useTranslations("common");
-  const { records, loading, error } = useRoastingRecords();
+  const { records, hasBeans, loading, error } = useRoastingRecords();
 
   const totalRecords = records.length;
   const scores = records.map((r) => r.cupping_score).filter((s): s is number => s != null);
@@ -127,6 +133,11 @@ export default function DashboardPage() {
     );
   }
 
+  const ctaHref = hasBeans ? "/brew-records" : "/bean-profiles";
+  const ctaTitle = hasBeans ? t("ctaTitleHasBeans") : t("ctaTitleNoBeans");
+  const ctaDescription = hasBeans ? t("ctaDescHasBeans") : t("ctaDescNoBeans");
+  const ctaButton = hasBeans ? t("ctaButtonRecord") : t("ctaButtonRegister");
+
   return (
     <div className="space-y-8">
       <div>
@@ -136,32 +147,47 @@ export default function DashboardPage() {
         <p className="mt-1 text-sm text-[var(--muted-foreground)]">{t("description")}</p>
       </div>
 
-      <WelcomeCard
-        title={t("welcomeTitle")}
-        line1={t("welcomeLine1")}
-        line2={t("welcomeLine2")}
-        cta={t("welcomeCta")}
-      />
+      <section className="min-h-[42vh] rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 sm:p-8">
+        <div className="mx-auto flex h-full max-w-3xl flex-col justify-center gap-5">
+          <p className="text-sm font-semibold text-[var(--primary)]">{t("ctaLead")}</p>
+          <h2 className="text-2xl font-semibold tracking-tight text-[var(--gray-dark)] sm:text-3xl">
+            {ctaTitle}
+          </h2>
+          <p className="text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base">
+            {ctaDescription}
+          </p>
+          <div>
+            <Link href={ctaHref}>
+              <Button size="lg" className="h-12 px-8 text-base font-semibold">
+                {ctaButton}
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
 
-      <KpiCards
-        totalRecords={totalRecords}
-        avgCupping={avgCupping}
-        recentTrend={recentTrend}
-      />
+      <section className="space-y-8 pt-8">
+        <KpiCards
+          totalRecords={totalRecords}
+          avgCupping={avgCupping}
+          recentTrend={recentTrend}
+        />
 
-      <AICoachPanel context="roast" entries={records} />
+        <AICoachPanel context="roast" entries={records} />
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <QualityRadarChart data={radarData} />
-        <QualityTrendChart data={trendData} />
-      </div>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <QualityRadarChart data={radarData} />
+          <QualityTrendChart data={trendData} />
+        </div>
 
-      <div>
-        <h2 className="mb-4 text-lg font-semibold text-[var(--gray-dark)]">
-          {t("advancedAnalytics")}
-        </h2>
-        <AdvancedAnalyticsScatter data={scatterData} />
-      </div>
+        <div>
+          <h2 className="mb-4 text-lg font-semibold text-[var(--gray-dark)]">
+            {t("advancedAnalytics")}
+          </h2>
+          <AdvancedAnalyticsScatter data={scatterData} />
+        </div>
+      </section>
     </div>
   );
 }

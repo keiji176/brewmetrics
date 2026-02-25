@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { AICoachPanel } from "@/components/ai-coach/AICoachPanel";
+import { DigitalTwinPanel } from "@/components/digital-twin/DigitalTwinPanel";
 import { Coffee, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -55,6 +56,8 @@ type BrewRecordForm = {
   notes: string;
 };
 
+type BrewRecordsTab = "record" | "analysis";
+
 const emptyForm: BrewRecordForm = {
   bean_name: "",
   variety: "",
@@ -83,6 +86,7 @@ export default function BrewRecordsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [varietyFilter, setVarietyFilter] = useState("all");
   const [varietySort, setVarietySort] = useState<"none" | "az" | "za">("none");
+  const [activeTab, setActiveTab] = useState<BrewRecordsTab>("record");
 
   const varietyOptions = ["Geisha", "Typica", "Bourbon", "Caturra", "Pacamara", "SL28"];
 
@@ -287,12 +291,43 @@ export default function BrewRecordsPage() {
           </h1>
           <p className="mt-1 text-sm text-[var(--muted-foreground)]">{t("description")}</p>
         </div>
-        <Button onClick={openCreate} className="gap-2" disabled={!userId}>
+        <Button
+          onClick={openCreate}
+          className="gap-2"
+          disabled={!userId || activeTab !== "record"}
+        >
           <Plus className="h-4 w-4" />
           {t("addRecord")}
         </Button>
       </div>
 
+      <div className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] p-1">
+        <button
+          type="button"
+          onClick={() => setActiveTab("record")}
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+            activeTab === "record"
+              ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
+              : "text-[var(--muted-foreground)] hover:bg-[var(--muted)]"
+          }`}
+        >
+          {t("tabRecord")}
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("analysis")}
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+            activeTab === "analysis"
+              ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
+              : "text-[var(--muted-foreground)] hover:bg-[var(--muted)]"
+          }`}
+        >
+          {t("tabAnalysis")}
+        </button>
+      </div>
+
+      {activeTab === "record" ? (
+        <>
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="flex max-h-[90vh] flex-col overflow-hidden p-0 sm:max-w-2xl">
           <DialogHeader className="sticky top-0 z-10 border-b bg-[var(--card)] px-6 pt-6 pb-4">
@@ -716,6 +751,15 @@ export default function BrewRecordsPage() {
               </CardContent>
             </Card>
           ))}
+        </div>
+      )}
+        </>
+      ) : (
+        <div className="space-y-6">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 text-sm text-[var(--muted-foreground)]">
+            {t("tabAnalysisDescription")}
+          </div>
+          <DigitalTwinPanel showHeader={false} />
         </div>
       )}
     </div>

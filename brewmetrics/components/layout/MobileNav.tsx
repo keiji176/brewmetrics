@@ -8,24 +8,28 @@ import {
   LayoutDashboard,
   Coffee,
   FileText,
-  Gauge,
   Wrench,
-  BookOpen,
-  Settings,
   Menu,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const navItems = [
-  { href: "/", labelKey: "nav.dashboard" as const, icon: LayoutDashboard },
-  { href: "/bean-profiles", labelKey: "nav.beanProfiles" as const, icon: Coffee },
-  { href: "/brew-records", labelKey: "nav.brewRecords" as const, icon: FileText },
-  { href: "/digital-twin", labelKey: "nav.digitalTwin" as const, icon: Gauge },
-  { href: "/gear-guide", labelKey: "nav.gearGuide" as const, icon: Wrench },
-  { href: "/glossary", labelKey: "nav.glossary" as const, icon: BookOpen },
-  { href: "/settings", labelKey: "nav.settings" as const, icon: Settings },
+const navGroups = [
+  {
+    headingKey: "nav.mainActions" as const,
+    items: [
+      { href: "/", labelKey: "nav.dashboard" as const, icon: LayoutDashboard },
+      { href: "/brew-records", labelKey: "nav.brewRecords" as const, icon: FileText },
+    ],
+  },
+  {
+    headingKey: "nav.dataSub" as const,
+    items: [
+      { href: "/bean-profiles", labelKey: "nav.beanProfiles" as const, icon: Coffee },
+      { href: "/gear-guide", labelKey: "nav.myGear" as const, icon: Wrench },
+    ],
+  },
 ];
 
 export function MobileNav() {
@@ -55,28 +59,41 @@ export function MobileNav() {
             <X className="h-5 w-5" />
           </Button>
         </div>
-        <nav className="flex-1 space-y-0.5 overflow-y-auto p-4">
-          {navItems.map((item) => {
-            const isActive =
-              pathname === item.href ||
-              (item.href !== "/" && pathname.startsWith(item.href));
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium",
-                  isActive
-                    ? "bg-[var(--accent)] text-[var(--primary)]"
-                    : "text-[var(--muted-foreground)] hover:bg-[var(--muted)]"
-                )}
-              >
-                <item.icon className="h-5 w-5 shrink-0" />
-                {t(item.labelKey)}
-              </Link>
-            );
-          })}
+        <nav className="flex-1 space-y-4 overflow-y-auto p-4">
+          {navGroups.map((group, groupIndex) => (
+            <div
+              key={group.headingKey}
+              className={cn(
+                "space-y-1.5",
+                groupIndex > 0 && "border-t border-[var(--border)] pt-4"
+              )}
+            >
+              <p className="px-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--muted-foreground)]">
+                {t(group.headingKey)}
+              </p>
+              {group.items.map((item) => {
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== "/" && pathname.startsWith(item.href));
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium",
+                      isActive
+                        ? "bg-[var(--accent)] text-[var(--primary)]"
+                        : "text-[var(--muted-foreground)] hover:bg-[var(--muted)]"
+                    )}
+                  >
+                    <item.icon className="h-5 w-5 shrink-0" />
+                    {t(item.labelKey)}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
       </div>
     </>

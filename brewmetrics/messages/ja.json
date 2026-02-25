@@ -14,12 +14,15 @@
   },
   "nav": {
     "dashboard": "ダッシュボード",
-    "beanProfiles": "コーヒー豆の情報",
+    "beanProfiles": "豆の情報",
     "brewRecords": "抽出記録",
     "digitalTwin": "デジタルツイン",
     "gearGuide": "器具ガイド",
+    "myGear": "マイ器具",
     "glossary": "用語解説",
     "settings": "設定",
+    "mainActions": "メインアクション",
+    "dataSub": "データ・サブ",
     "coffeeQualityPlatform": "コーヒー品質プラットフォーム"
   },
   "auth": {
@@ -68,6 +71,13 @@
     "welcomeLine1": "抽出と味を記録し、AIで改善できます。",
     "welcomeLine2": "データで、最高の1杯を再現しましょう。",
     "welcomeCta": "→ まずは豆を登録する",
+    "ctaLead": "ゴールデンパス",
+    "ctaTitleNoBeans": "まずは豆を登録しましょう",
+    "ctaDescNoBeans": "最初にコーヒー豆の情報を登録すると、次の抽出記録と評価がスムーズになります。",
+    "ctaTitleHasBeans": "次は抽出を記録しましょう",
+    "ctaDescHasBeans": "豆の登録が完了しています。抽出記録を追加して、味の評価と改善につなげましょう。",
+    "ctaButtonRegister": "豆を登録する",
+    "ctaButtonRecord": "抽出を記録する",
     "target": "目標",
     "score": "スコア",
     "batch": "バッチ"
@@ -106,6 +116,9 @@
   "brewRecords": {
     "title": "抽出記録",
     "description": "毎日の抽出レシピと味のメモを記録しましょう",
+    "tabRecord": "記録",
+    "tabAnalysis": "分析",
+    "tabAnalysisDescription": "味のシミュレーションで抽出条件を調整し、再現しやすい設定を見つけましょう。",
     "addRecord": "抽出記録を追加",
     "newRecord": "新規抽出記録",
     "editRecord": "抽出記録を編集",

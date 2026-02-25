@@ -14,12 +14,15 @@
   },
   "nav": {
     "dashboard": "Dashboard",
-    "beanProfiles": "Coffee Bean Info",
+    "beanProfiles": "Bean Info",
     "brewRecords": "Brew Records",
     "digitalTwin": "Digital Twin",
     "gearGuide": "Gear Guide",
+    "myGear": "My Gear",
     "glossary": "Glossary",
     "settings": "Settings",
+    "mainActions": "Main Actions",
+    "dataSub": "Data & Sub",
     "coffeeQualityPlatform": "Coffee quality platform"
   },
   "auth": {
@@ -68,6 +71,13 @@
     "welcomeLine1": "Record your brews and taste notes, then improve with AI.",
     "welcomeLine2": "Use data to reproduce your best cup.",
     "welcomeCta": "→ Add your first bean",
+    "ctaLead": "Golden Path",
+    "ctaTitleNoBeans": "Start by registering your beans",
+    "ctaDescNoBeans": "Add your coffee bean info first, then move smoothly to brew records and evaluation.",
+    "ctaTitleHasBeans": "Next, record your brew",
+    "ctaDescHasBeans": "Your bean info is ready. Add a brew record and continue to evaluation and improvement.",
+    "ctaButtonRegister": "Register Beans",
+    "ctaButtonRecord": "Record Brew",
     "target": "Target",
     "score": "Score",
     "batch": "Batch"
@@ -106,6 +116,9 @@
   "brewRecords": {
     "title": "Brew Records",
     "description": "Track your daily brewing records and tasting notes",
+    "tabRecord": "Record",
+    "tabAnalysis": "Analysis",
+    "tabAnalysisDescription": "Use the flavor simulation to tune brew parameters and find more reproducible settings.",
     "addRecord": "Add brew record",
     "newRecord": "New brew record",
     "editRecord": "Edit brew record",
