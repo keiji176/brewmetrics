@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { GrinderCalibrationRow } from "@/lib/supabase/types";
 import { GrindSize } from "@/lib/supabase/types";
@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ResponsiveContainer, RadialBarChart, RadialBar, Legend } from "recharts";
+import { Sparkles, Trophy } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 type RoastLevel = 1 | 2 | 3 | 4 | 5;
@@ -138,6 +139,7 @@ function normalizeGrindSize(input?: string | null): GrindSize | null {
 export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTwinPanelProps) {
   const t = useTranslations("digitalTwin");
   const supabase = createClient();
+  const wasPerfectScoreRef = useRef(false);
 
   const [temperature, setTemperature] = useState(92);
   const [manualGrindSize, setManualGrindSize] = useState<GrindSize>(GrindSize.MEDIUM);
@@ -147,6 +149,23 @@ export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTw
   const [calibrations, setCalibrations] = useState<GrinderCalibrationRow[]>([]);
   const [selectedCalibrationId, setSelectedCalibrationId] = useState("");
   const [clickInput, setClickInput] = useState("");
+  const [perfectMessage, setPerfectMessage] = useState<string | null>(null);
+
+  const perfectMessages = useMemo(
+    () => [
+      t("perfectMessage1"),
+      t("perfectMessage2"),
+      t("perfectMessage3"),
+      t("perfectMessage4"),
+      t("perfectMessage5"),
+      t("perfectMessage6"),
+      t("perfectMessage7"),
+      t("perfectMessage8"),
+      t("perfectMessage9"),
+      t("perfectMessage10"),
+    ],
+    [t]
+  );
 
   useEffect(() => {
     if (initialValues?.temperature != null) {
@@ -233,6 +252,21 @@ export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTw
       : score >= 70
         ? "var(--primary)"
         : "var(--coffee-900)";
+
+  const isPerfectScore = score === 100;
+
+  useEffect(() => {
+    if (isPerfectScore && !wasPerfectScoreRef.current) {
+      const selected = perfectMessages[Math.floor(Math.random() * perfectMessages.length)];
+      setPerfectMessage(selected);
+    }
+
+    if (!isPerfectScore && wasPerfectScoreRef.current) {
+      setPerfectMessage(null);
+    }
+
+    wasPerfectScoreRef.current = isPerfectScore;
+  }, [isPerfectScore, perfectMessages]);
 
   const gaugeData = [{ name: t("quality"), value: score, fill: scoreGaugeFill }];
 
@@ -439,13 +473,28 @@ export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTw
           </CardHeader>
           <CardContent>
             <div className="flex flex-col items-center gap-6">
-              <div
-                className={`text-5xl font-bold tabular-nums transition-all duration-300 sm:text-6xl ${scoreValueClass}`}
-                key={score}
-              >
-                {score.toFixed(1)}
+              <div className="relative">
+                <div
+                  className={`text-5xl font-bold tabular-nums transition-all duration-300 sm:text-6xl ${
+                    isPerfectScore
+                      ? "bg-gradient-to-r from-pink-500 via-amber-400 via-lime-400 via-cyan-500 to-violet-500 bg-clip-text text-transparent animate-pulse"
+                      : scoreValueClass
+                  }`}
+                  key={score}
+                >
+                  {score.toFixed(1)}
+                </div>
+                {isPerfectScore && (
+                  <Trophy className="absolute -right-7 -top-1 h-5 w-5 text-amber-500" aria-hidden="true" />
+                )}
               </div>
               <p className={`-mt-4 text-sm font-medium ${scoreValueClass}`}>{t(scoreBandLabelKey)}</p>
+              {isPerfectScore && (
+                <p className="-mt-3 flex items-center gap-1 text-xs font-semibold text-amber-600">
+                  <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                  {t("perfectScoreBadge")}
+                </p>
+              )}
               <div className="h-[240px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <RadialBarChart
@@ -465,9 +514,31 @@ export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTw
                   </RadialBarChart>
                 </ResponsiveContainer>
               </div>
-              <Card className={`w-full ${scoreFeedbackToneClass}`}>
-                <CardContent className="p-4">
-                  <p className="text-sm leading-relaxed text-[var(--foreground)]">{t(scoreFeedbackKey)}</p>
+              <Card className={`relative w-full overflow-hidden ${scoreFeedbackToneClass}`}>
+                <CardContent className="relative p-4">
+                  {isPerfectScore && (
+                    <>
+                      <div
+                        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-amber-100/40 via-transparent to-cyan-100/40"
+                        aria-hidden="true"
+                      />
+                      <Sparkles
+                        className="pointer-events-none absolute right-3 top-3 h-4 w-4 text-amber-500/80"
+                        aria-hidden="true"
+                      />
+                      <Sparkles
+                        className="pointer-events-none absolute bottom-3 left-3 h-3.5 w-3.5 text-cyan-500/80"
+                        aria-hidden="true"
+                      />
+                    </>
+                  )}
+                  {isPerfectScore ? (
+                    <p className="text-base font-semibold leading-relaxed text-[var(--foreground)] sm:text-lg">
+                      {perfectMessage ?? t("perfectScoreMessage")}
+                    </p>
+                  ) : (
+                    <p className="text-sm leading-relaxed text-[var(--foreground)]">{t(scoreFeedbackKey)}</p>
+                  )}
                 </CardContent>
               </Card>
             </div>
