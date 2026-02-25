@@ -15,7 +15,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "beanProfiles": "Bean Info",
-    "brewRecords": "Brew Records",
+    "brewRecords": "Brew Records & Analysis",
     "digitalTwin": "Digital Twin",
     "gearGuide": "Gear Guide",
     "myGear": "My Gear",
@@ -113,8 +113,8 @@
     "unnamed": "Unnamed"
   },
   "brewRecords": {
-    "title": "Brew Records",
-    "description": "Track your daily brewing records and tasting notes",
+    "title": "Brew Records & Analysis",
+    "description": "Record your daily brew recipes, then analyze and improve flavor with simulation.",
     "tabRecord": "Record",
     "tabAnalysis": "Analysis",
     "tabAnalysisDescription": "Use the flavor simulation to tune brew parameters and find more reproducible settings.",

@@ -15,7 +15,7 @@
   "nav": {
     "dashboard": "ダッシュボード",
     "beanProfiles": "豆の情報",
-    "brewRecords": "抽出記録",
+    "brewRecords": "抽出記録・分析",
     "digitalTwin": "デジタルツイン",
     "gearGuide": "器具ガイド",
     "myGear": "マイ器具",
@@ -113,8 +113,8 @@
     "unnamed": "名前なし"
   },
   "brewRecords": {
-    "title": "抽出記録",
-    "description": "毎日の抽出レシピと味のメモを記録しましょう",
+    "title": "抽出記録・分析",
+    "description": "毎日の抽出レシピを記録し、シミュレーションで味を分析・改善しましょう",
     "tabRecord": "記録",
     "tabAnalysis": "分析",
     "tabAnalysisDescription": "味のシミュレーションで抽出条件を調整し、再現しやすい設定を見つけましょう。",
