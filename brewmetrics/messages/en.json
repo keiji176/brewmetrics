@@ -43,7 +43,7 @@
     "title": "Dashboard",
     "description": "Summary of your coffee records and evaluations",
     "totalRecords": "Total Brews",
-    "totalRecordsSub": "brew records",
+    "totalRecordsSub": "cups",
     "averageCuppingScore": "Average Rating Score",
     "averageCuppingScoreSub": "average across all records",
     "batchesTracked": "Registered Beans",

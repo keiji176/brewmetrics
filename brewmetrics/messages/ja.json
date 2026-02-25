@@ -42,8 +42,8 @@
   "dashboard": {
     "title": "ダッシュボード",
     "description": "コーヒーの記録と評価のまとめ",
-    "totalRecords": "総抽出回数",
-    "totalRecordsSub": "回の抽出記録",
+    "totalRecords": "これまでに淹れた杯数",
+    "totalRecordsSub": "杯",
     "averageCuppingScore": "平均評価スコア",
     "averageCuppingScoreSub": "全記録の平均",
     "batchesTracked": "登録済みの豆",

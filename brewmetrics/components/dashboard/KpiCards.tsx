@@ -15,7 +15,12 @@ export function KpiCards({ totalRecords, avgCupping, recentTrend }: KpiCardsProp
   const trendLabel =
     recentTrend === "up" ? t("improving") : recentTrend === "down" ? t("declining") : t("stable");
   const kpis = [
-    { title: t("totalRecords"), value: String(totalRecords), sub: t("totalRecordsSub"), icon: Hash },
+    {
+      title: t("totalRecords"),
+      value: String(totalRecords),
+      sub: `${totalRecords} ${t("totalRecordsSub")}`,
+      icon: Hash,
+    },
     {
       title: t("averageCuppingScore"),
       value: avgCupping != null ? avgCupping.toFixed(1) : "—",
