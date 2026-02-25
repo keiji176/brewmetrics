@@ -583,7 +583,7 @@ export default function GearGuidePage() {
             <CardHeader>
               <div className="mb-2 flex items-center justify-between">
                 <Badge variant="secondary">{item.category}</Badge>
-                {item.isCustom ? (
+                {item.isCustom && (
                   <div className="flex items-center gap-1">
                     <Button
                       type="button"
