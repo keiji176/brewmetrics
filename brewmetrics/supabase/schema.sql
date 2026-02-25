@@ -211,3 +211,37 @@ create policy "Users can delete own grinder_calibrations"
 
 create index if not exists grinder_calibrations_user_id_idx
   on public.grinder_calibrations (user_id, created_at desc);
+
+-- User gears — selected personal gear list for future brew form integration
+create table if not exists public.user_gears (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users (id) on delete cascade not null,
+  gear_id text not null,
+  created_at timestamptz default now() not null,
+  unique (user_id, gear_id)
+);
+
+alter table public.user_gears enable row level security;
+
+drop policy if exists "Users can read own user_gears" on public.user_gears;
+create policy "Users can read own user_gears"
+  on public.user_gears for select
+  using (auth.uid() = user_id);
+
+drop policy if exists "Users can insert own user_gears" on public.user_gears;
+create policy "Users can insert own user_gears"
+  on public.user_gears for insert
+  with check (auth.uid() = user_id);
+
+drop policy if exists "Users can update own user_gears" on public.user_gears;
+create policy "Users can update own user_gears"
+  on public.user_gears for update
+  using (auth.uid() = user_id);
+
+drop policy if exists "Users can delete own user_gears" on public.user_gears;
+create policy "Users can delete own user_gears"
+  on public.user_gears for delete
+  using (auth.uid() = user_id);
+
+create index if not exists user_gears_user_id_idx
+  on public.user_gears (user_id, created_at desc);

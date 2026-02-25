@@ -149,7 +149,6 @@ export default function DashboardPage() {
 
       <section className="min-h-[42vh] rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 sm:p-8">
         <div className="mx-auto flex h-full max-w-3xl flex-col justify-center gap-5">
-          <p className="text-sm font-semibold text-[var(--primary)]">{t("ctaLead")}</p>
           <h2 className="text-2xl font-semibold tracking-tight text-[var(--gray-dark)] sm:text-3xl">
             {ctaTitle}
           </h2>

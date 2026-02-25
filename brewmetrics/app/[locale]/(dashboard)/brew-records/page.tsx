@@ -759,7 +759,14 @@ export default function BrewRecordsPage() {
           <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 text-sm text-[var(--muted-foreground)]">
             {t("tabAnalysisDescription")}
           </div>
-          <DigitalTwinPanel showHeader={false} />
+          <DigitalTwinPanel
+            showHeader={false}
+            initialValues={{
+              temperature: form.temperature,
+              extractionTime: form.brew_time,
+              grindSize: form.grind_size,
+            }}
+          />
         </div>
       )}
     </div>

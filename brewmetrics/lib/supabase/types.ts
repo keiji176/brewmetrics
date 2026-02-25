@@ -149,6 +149,26 @@ export interface Database {
           updated_at?: string;
         };
       };
+      user_gears: {
+        Row: {
+          id: string;
+          user_id: string;
+          gear_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          gear_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          gear_id?: string;
+          created_at?: string;
+        };
+      };
     };
   };
 }
@@ -167,3 +187,5 @@ export type RoastingRecordRow = Database["public"]["Tables"]["roasting_records"]
 export type RoastingRecordInsert = Database["public"]["Tables"]["roasting_records"]["Insert"];
 export type GrinderCalibrationRow = Database["public"]["Tables"]["grinder_calibrations"]["Row"];
 export type GrinderCalibrationInsert = Database["public"]["Tables"]["grinder_calibrations"]["Insert"];
+export type UserGearRow = Database["public"]["Tables"]["user_gears"]["Row"];
+export type UserGearInsert = Database["public"]["Tables"]["user_gears"]["Insert"];

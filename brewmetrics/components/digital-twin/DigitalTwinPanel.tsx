@@ -80,9 +80,61 @@ function estimateGrindSizeByClick(calibration: GrinderCalibrationRow, click: num
 
 interface DigitalTwinPanelProps {
   showHeader?: boolean;
+  initialValues?: {
+    temperature?: number | null;
+    extractionTime?: number | null;
+    grindSize?: string | null;
+  };
 }
 
-export function DigitalTwinPanel({ showHeader = true }: DigitalTwinPanelProps) {
+function normalizeGrindSize(input?: string | null): GrindSize | null {
+  if (!input) return null;
+
+  const normalized = input.trim().toLowerCase();
+  if (!normalized) return null;
+
+  if (
+    normalized.includes("fine") ||
+    normalized.includes("細") ||
+    normalized === "1"
+  ) {
+    return GrindSize.FINE;
+  }
+  if (
+    normalized.includes("medium-fine") ||
+    normalized.includes("medium fine") ||
+    normalized.includes("中細") ||
+    normalized === "2"
+  ) {
+    return GrindSize.MEDIUM_FINE;
+  }
+  if (
+    normalized === "medium" ||
+    normalized.includes("中挽") ||
+    normalized === "3"
+  ) {
+    return GrindSize.MEDIUM;
+  }
+  if (
+    normalized.includes("medium-coarse") ||
+    normalized.includes("medium coarse") ||
+    normalized.includes("中粗") ||
+    normalized === "4"
+  ) {
+    return GrindSize.MEDIUM_COARSE;
+  }
+  if (
+    normalized.includes("coarse") ||
+    normalized.includes("粗") ||
+    normalized === "5"
+  ) {
+    return GrindSize.COARSE;
+  }
+
+  return null;
+}
+
+export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTwinPanelProps) {
   const t = useTranslations("digitalTwin");
   const supabase = createClient();
 
@@ -94,6 +146,23 @@ export function DigitalTwinPanel({ showHeader = true }: DigitalTwinPanelProps) {
   const [calibrations, setCalibrations] = useState<GrinderCalibrationRow[]>([]);
   const [selectedCalibrationId, setSelectedCalibrationId] = useState("");
   const [clickInput, setClickInput] = useState("");
+
+  useEffect(() => {
+    if (initialValues?.temperature != null) {
+      const safeTemp = Math.max(80, Math.min(100, initialValues.temperature));
+      setTemperature(safeTemp);
+    }
+
+    if (initialValues?.extractionTime != null) {
+      const safeTime = Math.max(60, Math.min(300, initialValues.extractionTime));
+      setExtractionTime(safeTime);
+    }
+
+    const mappedGrind = normalizeGrindSize(initialValues?.grindSize);
+    if (mappedGrind) {
+      setManualGrindSize(mappedGrind);
+    }
+  }, [initialValues]);
 
   useEffect(() => {
     if (!supabase) return;
