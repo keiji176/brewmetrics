@@ -425,7 +425,7 @@
     "grinderCalibrationMovedDescription": "Create and edit click-conversion settings from the My Gear page.",
     "goToMyGear": "Open My Gear",
     "grinderCalibrationTitle": "Grinder Calibration",
-    "grinderCalibrationDescription": "Save your grinder click conversion so Digital Twin can estimate grind size automatically.",
+    "grinderCalibrationDescription": "Save your grinder click conversion so the analysis simulation can estimate grind size automatically.",
     "grinderName": "Grinder Name",
     "grinderNamePlaceholder": "e.g. TIMEMORE C2",
     "fineClick": "Fine Click",

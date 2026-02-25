@@ -425,7 +425,7 @@
     "grinderCalibrationMovedDescription": "クリック数換算の登録・編集は「マイ器具」ページで管理できます。",
     "goToMyGear": "マイ器具を開く",
     "grinderCalibrationTitle": "グラインダーキャリブレーション",
-    "grinderCalibrationDescription": "グラインダーのクリック数換算を保存し、Digital Twinで挽き目を自動判定できるようにします。",
+    "grinderCalibrationDescription": "グラインダーのクリック数換算を保存し、分析機能の抽出シミュレーションで挽き目を自動判定できるようにします。",
     "grinderName": "グラインダー名",
     "grinderNamePlaceholder": "例：TIMEMORE C2",
     "fineClick": "細挽きクリック数",
