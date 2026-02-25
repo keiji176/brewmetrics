@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Radar,
@@ -36,7 +37,15 @@ export function QualityRadarChart({ data = DEFAULT_DATA }: QualityRadarChartProp
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-[var(--gray-dark)]">{t("qualityProfile")}</CardTitle>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <CardTitle className="text-[var(--gray-dark)]">{t("qualityProfile")}</CardTitle>
+          <Link
+            href="/glossary#extraction"
+            className="text-xs font-medium text-[var(--primary)] underline-offset-2 hover:underline"
+          >
+            {t("qualityProfileHelp")}
+          </Link>
+        </div>
         <CardDescription>{t("qualityProfileDescription")}</CardDescription>
       </CardHeader>
       <CardContent>

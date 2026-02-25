@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -344,7 +345,15 @@ export default function BrewRecordsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="grind_size">{t("grindSize")}</Label>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="grind_size">{t("grindSize")}</Label>
+                    <Link
+                      href="/glossary#grindSize"
+                      className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
+                    >
+                      {t("glossaryLink")}
+                    </Link>
+                  </div>
                   <Input
                     id="grind_size"
                     value={form.grind_size}
@@ -355,7 +364,15 @@ export default function BrewRecordsPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="temperature">{t("temperature")}</Label>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="temperature">{t("temperature")}</Label>
+                    <Link
+                      href="/glossary#extraction"
+                      className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
+                    >
+                      {t("glossaryLink")}
+                    </Link>
+                  </div>
                   <Input
                     id="temperature"
                     type="number"
@@ -375,7 +392,15 @@ export default function BrewRecordsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="coffee_weight">{t("coffeeWeight")}</Label>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="coffee_weight">{t("coffeeWeight")}</Label>
+                    <Link
+                      href="/glossary#brewRatio"
+                      className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
+                    >
+                      {t("glossaryLink")}
+                    </Link>
+                  </div>
                   <Input
                     id="coffee_weight"
                     type="number"
@@ -392,7 +417,15 @@ export default function BrewRecordsPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="water_weight">{t("waterWeight")}</Label>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="water_weight">{t("waterWeight")}</Label>
+                    <Link
+                      href="/glossary#brewRatio"
+                      className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
+                    >
+                      {t("glossaryLink")}
+                    </Link>
+                  </div>
                   <Input
                     id="water_weight"
                     type="number"
@@ -411,7 +444,15 @@ export default function BrewRecordsPage() {
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="brew_time">{t("brewTime")}</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="brew_time">{t("brewTime")}</Label>
+                  <Link
+                    href="/glossary#extraction"
+                    className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
+                  >
+                    {t("glossaryLink")}
+                  </Link>
+                </div>
                 <Input
                   id="brew_time"
                   type="number"
@@ -428,7 +469,15 @@ export default function BrewRecordsPage() {
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="cupping_score">{t("scoreOrImpression")}</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="cupping_score">{t("scoreOrImpression")}</Label>
+                  <Link
+                    href="/glossary#cupping"
+                    className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
+                  >
+                    {t("glossaryLink")}
+                  </Link>
+                </div>
                 <Input
                   id="cupping_score"
                   type="number"
@@ -447,7 +496,15 @@ export default function BrewRecordsPage() {
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="notes">{t("notes")}</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="notes">{t("notes")}</Label>
+                  <Link
+                    href="/glossary#flavorNotes"
+                    className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
+                  >
+                    {t("glossaryLink")}
+                  </Link>
+                </div>
                 <Textarea
                   id="notes"
                   value={form.notes}

@@ -23,6 +23,7 @@ export function GlossaryCard({
 
   return (
     <Card
+      id={term.id}
       className={cn(
         "group overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[var(--coffee-300)]",
         "animate-fade-in"

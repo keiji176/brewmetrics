@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { GrinderCalibrationRow } from "@/lib/supabase/types";
 import { GrindSize } from "@/lib/supabase/types";
+import { Link } from "@/i18n/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -194,8 +195,16 @@ export default function DigitalTwinPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <Label>{t("roastLevel")}</Label>
+              <div className="flex items-center justify-between gap-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <Label>{t("roastLevel")}</Label>
+                  <Link
+                    href="/glossary#roasting"
+                    className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
+                  >
+                    {t("glossaryLink")}
+                  </Link>
+                </div>
                 <span className="font-medium text-[var(--foreground)]">{roastLabelMap[roastLevel]}</span>
               </div>
               <select
@@ -217,11 +226,20 @@ export default function DigitalTwinPage() {
                   timeMax: selectedRoastTarget.timeMax,
                 })}
               </p>
+              <p className="text-xs text-[var(--muted-foreground)]">{t("roastLevelHint")}</p>
             </div>
 
             <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <Label>{t("temperature")} ({t("temperatureUnit")})</Label>
+              <div className="flex items-center justify-between gap-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <Label>{t("temperature")} ({t("temperatureUnit")})</Label>
+                  <Link
+                    href="/glossary#extraction"
+                    className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
+                  >
+                    {t("glossaryLink")}
+                  </Link>
+                </div>
                 <span className="font-medium text-[var(--foreground)]">{temperature}</span>
               </div>
               <input
@@ -233,10 +251,19 @@ export default function DigitalTwinPage() {
                 onChange={(e) => setTemperature(Number(e.target.value))}
                 className="h-2 w-full appearance-none rounded-full bg-[var(--muted)] [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--primary)]"
               />
+              <p className="text-xs text-[var(--muted-foreground)]">{t("temperatureHint")}</p>
             </div>
             <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <Label>{t("grindSize")}</Label>
+              <div className="flex items-center justify-between gap-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <Label>{t("grindSize")}</Label>
+                  <Link
+                    href="/glossary#grindSize"
+                    className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
+                  >
+                    {t("glossaryLink")}
+                  </Link>
+                </div>
                 <span className="font-medium text-[var(--foreground)]">{grindLabelMap[effectiveGrindSize]}</span>
               </div>
               <select
@@ -250,6 +277,7 @@ export default function DigitalTwinPage() {
                   </option>
                 ))}
               </select>
+              <p className="text-xs text-[var(--muted-foreground)]">{t("grindSizeHint")}</p>
               <p className="text-xs text-[var(--muted-foreground)]">{t("grindHelp")}</p>
             </div>
 
@@ -294,8 +322,16 @@ export default function DigitalTwinPage() {
             </div>
 
             <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <Label>{t("extractionTime")} ({t("extractionUnit")})</Label>
+              <div className="flex items-center justify-between gap-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <Label>{t("extractionTime")} ({t("extractionUnit")})</Label>
+                  <Link
+                    href="/glossary#extraction"
+                    className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
+                  >
+                    {t("glossaryLink")}
+                  </Link>
+                </div>
                 <span className="font-medium text-[var(--foreground)]">{extractionTime}</span>
               </div>
               <input
@@ -307,13 +343,22 @@ export default function DigitalTwinPage() {
                 onChange={(e) => setExtractionTime(Number(e.target.value))}
                 className="h-2 w-full appearance-none rounded-full bg-[var(--muted)] [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--primary)]"
               />
+              <p className="text-xs text-[var(--muted-foreground)]">{t("extractionTimeHint")}</p>
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-[var(--gray-dark)]">{t("simulatedQualityScore")}</CardTitle>
+            <div className="flex items-center justify-between gap-2">
+              <CardTitle className="text-[var(--gray-dark)]">{t("simulatedQualityScore")}</CardTitle>
+              <Link
+                href="/glossary#simulationScoringFormula"
+                className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
+              >
+                {t("scoreGuideLink")}
+              </Link>
+            </div>
             <CardDescription>{t("simulatedQualityScoreDescription")}</CardDescription>
           </CardHeader>
           <CardContent>

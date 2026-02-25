@@ -90,12 +90,12 @@ export default function DashboardPage() {
       : "neutral";
 
   const radarData = [
-    { subject: "Acidity", value: 0, fullMark: 100 },
-    { subject: "Sweetness", value: 0, fullMark: 100 },
-    { subject: "Body", value: 0, fullMark: 100 },
-    { subject: "Bitterness", value: 0, fullMark: 100 },
-    { subject: "Aroma", value: 0, fullMark: 100 },
-    { subject: "Aftertaste", value: 0, fullMark: 100 },
+    { subject: t("radarAcidity"), value: 0, fullMark: 100 },
+    { subject: t("radarSweetness"), value: 0, fullMark: 100 },
+    { subject: t("radarBody"), value: 0, fullMark: 100 },
+    { subject: t("radarBitterness"), value: 0, fullMark: 100 },
+    { subject: t("radarAroma"), value: 0, fullMark: 100 },
+    { subject: t("radarAftertaste"), value: 0, fullMark: 100 },
   ];
   if (avgCupping != null && avgCupping > 0) {
     const v = Math.round(avgCupping * 0.9);
