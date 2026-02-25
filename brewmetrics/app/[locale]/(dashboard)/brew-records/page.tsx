@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +23,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { AICoachPanel } from "@/components/ai-coach/AICoachPanel";
 import { DigitalTwinPanel } from "@/components/digital-twin/DigitalTwinPanel";
+import { GlossaryHelpTooltip } from "@/components/help/GlossaryHelpTooltip";
 import { Coffee, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -57,6 +57,7 @@ type BrewRecordForm = {
 };
 
 type BrewRecordsTab = "record" | "analysis";
+
 
 const emptyForm: BrewRecordForm = {
   bean_name: "",
@@ -382,12 +383,12 @@ export default function BrewRecordsPage() {
                 <div className="grid gap-2">
                   <div className="flex items-center gap-2">
                     <Label htmlFor="grind_size">{t("grindSize")}</Label>
-                    <Link
+                    <GlossaryHelpTooltip
                       href="/glossary#grindSize"
-                      className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
-                    >
-                      {t("glossaryLink")}
-                    </Link>
+                      description={t("tooltipGrindSize")}
+                      buttonLabel={t("glossaryLink")}
+                      learnMoreLabel={t("tooltipSeeMore")}
+                    />
                   </div>
                   <Input
                     id="grind_size"
@@ -401,12 +402,12 @@ export default function BrewRecordsPage() {
                 <div className="grid gap-2">
                   <div className="flex items-center gap-2">
                     <Label htmlFor="temperature">{t("temperature")}</Label>
-                    <Link
+                    <GlossaryHelpTooltip
                       href="/glossary#extraction"
-                      className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
-                    >
-                      {t("glossaryLink")}
-                    </Link>
+                      description={t("tooltipExtraction")}
+                      buttonLabel={t("glossaryLink")}
+                      learnMoreLabel={t("tooltipSeeMore")}
+                    />
                   </div>
                   <Input
                     id="temperature"
@@ -429,12 +430,12 @@ export default function BrewRecordsPage() {
                 <div className="grid gap-2">
                   <div className="flex items-center gap-2">
                     <Label htmlFor="coffee_weight">{t("coffeeWeight")}</Label>
-                    <Link
+                    <GlossaryHelpTooltip
                       href="/glossary#brewRatio"
-                      className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
-                    >
-                      {t("glossaryLink")}
-                    </Link>
+                      description={t("tooltipBrewRatio")}
+                      buttonLabel={t("glossaryLink")}
+                      learnMoreLabel={t("tooltipSeeMore")}
+                    />
                   </div>
                   <Input
                     id="coffee_weight"
@@ -454,12 +455,12 @@ export default function BrewRecordsPage() {
                 <div className="grid gap-2">
                   <div className="flex items-center gap-2">
                     <Label htmlFor="water_weight">{t("waterWeight")}</Label>
-                    <Link
+                    <GlossaryHelpTooltip
                       href="/glossary#brewRatio"
-                      className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
-                    >
-                      {t("glossaryLink")}
-                    </Link>
+                      description={t("tooltipBrewRatio")}
+                      buttonLabel={t("glossaryLink")}
+                      learnMoreLabel={t("tooltipSeeMore")}
+                    />
                   </div>
                   <Input
                     id="water_weight"
@@ -481,12 +482,12 @@ export default function BrewRecordsPage() {
               <div className="grid gap-2">
                 <div className="flex items-center gap-2">
                   <Label htmlFor="brew_time">{t("brewTime")}</Label>
-                  <Link
+                  <GlossaryHelpTooltip
                     href="/glossary#extraction"
-                    className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
-                  >
-                    {t("glossaryLink")}
-                  </Link>
+                    description={t("tooltipExtraction")}
+                    buttonLabel={t("glossaryLink")}
+                    learnMoreLabel={t("tooltipSeeMore")}
+                  />
                 </div>
                 <Input
                   id="brew_time"
@@ -506,12 +507,12 @@ export default function BrewRecordsPage() {
               <div className="grid gap-2">
                 <div className="flex items-center gap-2">
                   <Label htmlFor="cupping_score">{t("scoreOrImpression")}</Label>
-                  <Link
+                  <GlossaryHelpTooltip
                     href="/glossary#cupping"
-                    className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
-                  >
-                    {t("glossaryLink")}
-                  </Link>
+                    description={t("tooltipCupping")}
+                    buttonLabel={t("glossaryLink")}
+                    learnMoreLabel={t("tooltipSeeMore")}
+                  />
                 </div>
                 <Input
                   id="cupping_score"
@@ -533,12 +534,12 @@ export default function BrewRecordsPage() {
               <div className="grid gap-2">
                 <div className="flex items-center gap-2">
                   <Label htmlFor="notes">{t("notes")}</Label>
-                  <Link
+                  <GlossaryHelpTooltip
                     href="/glossary#flavorNotes"
-                    className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
-                  >
-                    {t("glossaryLink")}
-                  </Link>
+                    description={t("tooltipFlavorNotes")}
+                    buttonLabel={t("glossaryLink")}
+                    learnMoreLabel={t("tooltipSeeMore")}
+                  />
                 </div>
                 <Textarea
                   id="notes"

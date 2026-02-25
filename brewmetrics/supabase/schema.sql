@@ -16,17 +16,17 @@ create table if not exists public.profiles (
 
 alter table public.profiles enable row level security;
 
--- Users can read only their own profile
+drop policy if exists "Users can read own profile" on public.profiles;
 create policy "Users can read own profile"
   on public.profiles for select
   using (auth.uid() = id);
 
--- Users can insert their own profile (on signup)
+drop policy if exists "Users can insert own profile" on public.profiles;
 create policy "Users can insert own profile"
   on public.profiles for insert
   with check (auth.uid() = id);
 
--- Users can update only their own profile
+drop policy if exists "Users can update own profile" on public.profiles;
 create policy "Users can update own profile"
   on public.profiles for update
   using (auth.uid() = id);
@@ -46,27 +46,27 @@ create table if not exists public.roasting_records (
 
 alter table public.roasting_records enable row level security;
 
--- Users can read only their own records
+drop policy if exists "Users can read own roasting_records" on public.roasting_records;
 create policy "Users can read own roasting_records"
   on public.roasting_records for select
   using (auth.uid() = user_id);
 
--- Users can insert only with their own user_id
+drop policy if exists "Users can insert own roasting_records" on public.roasting_records;
 create policy "Users can insert own roasting_records"
   on public.roasting_records for insert
   with check (auth.uid() = user_id);
 
--- Users can update only their own records
+drop policy if exists "Users can update own roasting_records" on public.roasting_records;
 create policy "Users can update own roasting_records"
   on public.roasting_records for update
   using (auth.uid() = user_id);
 
--- Users can delete only their own records
+drop policy if exists "Users can delete own roasting_records" on public.roasting_records;
 create policy "Users can delete own roasting_records"
   on public.roasting_records for delete
   using (auth.uid() = user_id);
 
--- Optional: trigger to create profile on signup (Supabase Auth hook or trigger)
+-- Optional: trigger to create profile on signup
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
@@ -89,7 +89,7 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
--- Bean profiles — basic bean information for home baristas
+-- Bean profiles
 create table if not exists public.bean_profiles (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users (id) on delete cascade not null,
@@ -103,7 +103,6 @@ create table if not exists public.bean_profiles (
 );
 
 alter table public.bean_profiles add column if not exists variety text;
-
 alter table public.bean_profiles enable row level security;
 
 drop policy if exists "Users can read own bean_profiles" on public.bean_profiles;
@@ -129,7 +128,7 @@ create policy "Users can delete own bean_profiles"
 create index if not exists bean_profiles_user_id_created_at_idx
   on public.bean_profiles (user_id, created_at desc);
 
--- Brew records — home barista extraction journal
+-- Brew records
 create table if not exists public.brew_records (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users (id) on delete cascade not null,
@@ -147,7 +146,6 @@ create table if not exists public.brew_records (
 );
 
 alter table public.brew_records add column if not exists variety text;
-
 alter table public.brew_records enable row level security;
 
 drop policy if exists "Users can read own brew_records" on public.brew_records;
@@ -173,7 +171,7 @@ create policy "Users can delete own brew_records"
 create index if not exists brew_records_user_id_created_at_idx
   on public.brew_records (user_id, created_at desc);
 
--- Grinder calibration — user-defined click mapping for grind size estimation
+-- Grinder calibration
 create table if not exists public.grinder_calibrations (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users (id) on delete cascade not null,
@@ -212,7 +210,7 @@ create policy "Users can delete own grinder_calibrations"
 create index if not exists grinder_calibrations_user_id_idx
   on public.grinder_calibrations (user_id, created_at desc);
 
--- User gears — selected personal gear list for future brew form integration
+-- User gears
 create table if not exists public.user_gears (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users (id) on delete cascade not null,
@@ -245,3 +243,37 @@ create policy "Users can delete own user_gears"
 
 create index if not exists user_gears_user_id_idx
   on public.user_gears (user_id, created_at desc);
+
+-- User custom gears
+create table if not exists public.user_custom_gears (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users (id) on delete cascade not null,
+  category text not null,
+  gear_name text not null,
+  created_at timestamptz default now() not null
+);
+
+alter table public.user_custom_gears enable row level security;
+
+drop policy if exists "Users can read own user_custom_gears" on public.user_custom_gears;
+create policy "Users can read own user_custom_gears"
+  on public.user_custom_gears for select
+  using (auth.uid() = user_id);
+
+drop policy if exists "Users can insert own user_custom_gears" on public.user_custom_gears;
+create policy "Users can insert own user_custom_gears"
+  on public.user_custom_gears for insert
+  with check (auth.uid() = user_id);
+
+drop policy if exists "Users can update own user_custom_gears" on public.user_custom_gears;
+create policy "Users can update own user_custom_gears"
+  on public.user_custom_gears for update
+  using (auth.uid() = user_id);
+
+drop policy if exists "Users can delete own user_custom_gears" on public.user_custom_gears;
+create policy "Users can delete own user_custom_gears"
+  on public.user_custom_gears for delete
+  using (auth.uid() = user_id);
+
+create index if not exists user_custom_gears_user_id_idx
+  on public.user_custom_gears (user_id, created_at desc);

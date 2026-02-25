@@ -16,7 +16,6 @@ export type MyGearCatalogItem = {
     ja: string;
     en: string;
   };
-  priceRange: string;
 };
 
 export type MyGearOption = {
@@ -29,7 +28,6 @@ const myGearCatalog: MyGearCatalogItem[] = [
     id: "hario-v60",
     category: { ja: "ドリッパー", en: "Dripper" },
     name: { ja: "HARIO V60", en: "HARIO V60" },
-    priceRange: "¥¥",
     bestFor: { ja: "クリアで香りの立つ一杯", en: "Clean and aromatic cups" },
     note: {
       ja: "抽出速度をコントロールしやすく、定番のハンドドリップ器具です。",
@@ -40,7 +38,6 @@ const myGearCatalog: MyGearCatalogItem[] = [
     id: "kalita-wave",
     category: { ja: "ドリッパー", en: "Dripper" },
     name: { ja: "Kalita Wave", en: "Kalita Wave" },
-    priceRange: "¥¥",
     bestFor: { ja: "安定した抽出", en: "Consistent brewing" },
     note: {
       ja: "フラットボトム構造で、初心者でも味の再現性を出しやすいです。",
@@ -51,7 +48,6 @@ const myGearCatalog: MyGearCatalogItem[] = [
     id: "timemore-c2-c3",
     category: { ja: "グラインダー", en: "Grinder" },
     name: { ja: "TIMEMORE C2/C3", en: "TIMEMORE C2/C3" },
-    priceRange: "¥¥",
     bestFor: { ja: "コスパ重視で均一な挽き目", en: "Great value and uniform grinding" },
     note: {
       ja: "ホームバリスタ向けの人気ハンドミル。粒度調整がしやすいです。",
@@ -62,7 +58,6 @@ const myGearCatalog: MyGearCatalogItem[] = [
     id: "comandante-c40",
     category: { ja: "グラインダー", en: "Grinder" },
     name: { ja: "Comandante C40", en: "Comandante C40" },
-    priceRange: "¥¥¥",
     bestFor: { ja: "高精度な抽出", en: "High-precision brews" },
     note: {
       ja: "粒度の均一性が高く、繊細な味の違いを出しやすい上級者向け。",
@@ -73,7 +68,6 @@ const myGearCatalog: MyGearCatalogItem[] = [
     id: "hario-drip-scale",
     category: { ja: "スケール", en: "Scale" },
     name: { ja: "HARIO Drip Scale", en: "HARIO Drip Scale" },
-    priceRange: "¥¥",
     bestFor: { ja: "抽出時間と湯量の管理", en: "Tracking dose and brew time" },
     note: {
       ja: "タイマー付きで注湯レシピを再現しやすい基本の一台です。",
@@ -84,7 +78,6 @@ const myGearCatalog: MyGearCatalogItem[] = [
     id: "fellow-stagg-ekg",
     category: { ja: "ケトル", en: "Kettle" },
     name: { ja: "Fellow Stagg EKG", en: "Fellow Stagg EKG" },
-    priceRange: "¥¥¥",
     bestFor: { ja: "湯温を正確に管理", en: "Precise temperature control" },
     note: {
       ja: "温度設定と細口注湯で、安定したハンドドリップに向いています。",
@@ -100,7 +93,6 @@ export function getMyGearCatalog(locale: string) {
     name: locale === "ja" ? item.name.ja : item.name.en,
     bestFor: locale === "ja" ? item.bestFor.ja : item.bestFor.en,
     note: locale === "ja" ? item.note.ja : item.note.en,
-    priceRange: item.priceRange,
   }));
 }
 

@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { GrinderCalibrationRow } from "@/lib/supabase/types";
 import { GrindSize } from "@/lib/supabase/types";
 import { Link } from "@/i18n/navigation";
+import { GlossaryHelpTooltip } from "@/components/help/GlossaryHelpTooltip";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -273,12 +274,12 @@ export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTw
               <div className="flex items-center justify-between gap-3 text-sm">
                 <div className="flex items-center gap-2">
                   <Label>{t("roastLevel")}</Label>
-                  <Link
+                  <GlossaryHelpTooltip
                     href="/glossary#roasting"
-                    className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
-                  >
-                    {t("glossaryLink")}
-                  </Link>
+                    description={t("tooltipRoastLevel")}
+                    buttonLabel={t("glossaryLink")}
+                    learnMoreLabel={t("tooltipSeeMore")}
+                  />
                 </div>
                 <span className="font-medium text-[var(--foreground)]">{roastLabelMap[roastLevel]}</span>
               </div>
@@ -308,12 +309,12 @@ export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTw
               <div className="flex items-center justify-between gap-3 text-sm">
                 <div className="flex items-center gap-2">
                   <Label>{t("temperature")} ({t("temperatureUnit")})</Label>
-                  <Link
+                  <GlossaryHelpTooltip
                     href="/glossary#extraction"
-                    className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
-                  >
-                    {t("glossaryLink")}
-                  </Link>
+                    description={t("tooltipExtraction")}
+                    buttonLabel={t("glossaryLink")}
+                    learnMoreLabel={t("tooltipSeeMore")}
+                  />
                 </div>
                 <span className="font-medium text-[var(--foreground)]">{temperature}</span>
               </div>
@@ -332,12 +333,12 @@ export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTw
               <div className="flex items-center justify-between gap-3 text-sm">
                 <div className="flex items-center gap-2">
                   <Label>{t("grindSize")}</Label>
-                  <Link
+                  <GlossaryHelpTooltip
                     href="/glossary#grindSize"
-                    className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
-                  >
-                    {t("glossaryLink")}
-                  </Link>
+                    description={t("tooltipGrindSize")}
+                    buttonLabel={t("glossaryLink")}
+                    learnMoreLabel={t("tooltipSeeMore")}
+                  />
                 </div>
                 <span className="font-medium text-[var(--foreground)]">{grindLabelMap[effectiveGrindSize]}</span>
               </div>
@@ -400,12 +401,12 @@ export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTw
               <div className="flex items-center justify-between gap-3 text-sm">
                 <div className="flex items-center gap-2">
                   <Label>{t("extractionTime")} ({t("extractionUnit")})</Label>
-                  <Link
+                  <GlossaryHelpTooltip
                     href="/glossary#extraction"
-                    className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
-                  >
-                    {t("glossaryLink")}
-                  </Link>
+                    description={t("tooltipExtraction")}
+                    buttonLabel={t("glossaryLink")}
+                    learnMoreLabel={t("tooltipSeeMore")}
+                  />
                 </div>
                 <span className="font-medium text-[var(--foreground)]">{extractionTime}</span>
               </div>
@@ -427,12 +428,12 @@ export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTw
           <CardHeader>
             <div className="flex items-center justify-between gap-2">
               <CardTitle className="text-[var(--gray-dark)]">{t("simulatedQualityScore")}</CardTitle>
-              <Link
+              <GlossaryHelpTooltip
                 href="/glossary#simulationScoringFormula"
-                className="text-xs text-[var(--primary)] underline-offset-2 hover:underline"
-              >
-                {t("scoreGuideLink")}
-              </Link>
+                description={t("tooltipScoreFormula")}
+                buttonLabel={t("scoreGuideLink")}
+                learnMoreLabel={t("tooltipSeeMore")}
+              />
             </div>
             <CardDescription>{t("simulatedQualityScoreDescription")}</CardDescription>
           </CardHeader>
