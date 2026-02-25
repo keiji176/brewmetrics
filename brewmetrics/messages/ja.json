@@ -41,7 +41,7 @@
   },
   "dashboard": {
     "title": "ダッシュボード",
-    "description": "ロースター品質メトリクスの概要",
+    "description": "コーヒーの記録と評価のまとめ",
     "totalRecords": "総レコード数",
     "totalRecordsSub": "焙煎レコード",
     "averageCuppingScore": "平均カッピングスコア",

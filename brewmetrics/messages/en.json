@@ -41,7 +41,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "description": "Overview of your roastery quality metrics",
+    "description": "Summary of your coffee records and evaluations",
     "totalRecords": "Total Records",
     "totalRecordsSub": "roasting records",
     "averageCuppingScore": "Average Cupping Score",
