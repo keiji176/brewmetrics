@@ -104,11 +104,16 @@ create table if not exists public.bean_profiles (
 
 alter table public.bean_profiles add column if not exists variety text;
 alter table public.bean_profiles add column if not exists bean_name text;
+alter table public.bean_profiles add column if not exists name text;
 alter table public.bean_profiles add column if not exists roaster text;
 alter table public.bean_profiles add column if not exists origin text;
 alter table public.bean_profiles add column if not exists roast_level text;
 alter table public.bean_profiles add column if not exists process text;
 alter table public.bean_profiles add column if not exists created_at timestamptz default now() not null;
+update public.bean_profiles
+set name = coalesce(name, bean_name, '')
+where name is null;
+alter table public.bean_profiles alter column name drop not null;
 alter table public.bean_profiles enable row level security;
 
 drop policy if exists "Users can read own bean_profiles" on public.bean_profiles;

@@ -113,6 +113,10 @@ export default function BeanProfilesPage() {
     e.preventDefault();
     if (!supabase || !userId) return;
     setSaving(true);
+
+    const isLegacyNameConstraintError = (message?: string) =>
+      Boolean(message?.includes("null value in column \"name\"") && message?.includes("bean_profiles"));
+
     const payload = {
       bean_name: form.bean_name || null,
       variety: form.variety || null,
@@ -121,11 +125,26 @@ export default function BeanProfilesPage() {
       roast_level: form.roast_level || null,
       process: form.process || null,
     };
+
+    const legacyPayload = {
+      ...payload,
+      name: form.bean_name || "",
+    };
+
     if (editing) {
-      const { error: e } = await supabase
+      let { error: e } = await supabase
         .from("bean_profiles")
         .update(payload)
         .eq("id", editing.id);
+
+      if (e && isLegacyNameConstraintError(e.message)) {
+        const retry = await supabase
+          .from("bean_profiles")
+          .update(legacyPayload)
+          .eq("id", editing.id);
+        e = retry.error;
+      }
+
       setSaving(false);
       if (e) {
         setError(e.message);
@@ -135,11 +154,27 @@ export default function BeanProfilesPage() {
         prev.map((r) => (r.id === editing.id ? { ...r, ...payload } : r))
       );
     } else {
-      const { data, error: e } = await supabase
+      const insertPayload = {
+        ...payload,
+        user_id: userId,
+      };
+
+      let { data, error: e } = await supabase
         .from("bean_profiles")
-        .insert({ ...payload, user_id: userId })
+        .insert(insertPayload)
         .select()
         .single();
+
+      if (e && isLegacyNameConstraintError(e.message)) {
+        const retry = await supabase
+          .from("bean_profiles")
+          .insert({ ...insertPayload, name: form.bean_name || "" })
+          .select()
+          .single();
+        data = retry.data;
+        e = retry.error;
+      }
+
       setSaving(false);
       if (e) {
         setError(e.message);
