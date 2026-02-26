@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GlossaryCard } from "@/components/glossary/GlossaryCard";
@@ -44,16 +43,19 @@ type CategoryFilter = "all" | "basics" | "varieties" | "simulation";
 
 export default function GlossaryPage() {
   const t = useTranslations("glossary");
-  const searchParams = useSearchParams();
-  const initialCategory = searchParams.get("category");
   const [query, setQuery] = useState("");
   const [searchScope, setSearchScope] = useState<SearchScope>("all");
-  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>(() => {
-    if (initialCategory === "basics") return "basics";
-    if (initialCategory === "varieties") return "varieties";
-    if (initialCategory === "simulation") return "simulation";
-    return "all";
-  });
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const category = params.get("category");
+
+    if (category === "basics") setCategoryFilter("basics");
+    else if (category === "varieties") setCategoryFilter("varieties");
+    else if (category === "simulation") setCategoryFilter("simulation");
+    else setCategoryFilter("all");
+  }, []);
 
   const terms = useMemo<GlossaryEntry[]>(
     () =>
