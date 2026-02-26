@@ -10,6 +10,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useBulkSelection } from "@/hooks/useBulkSelection";
 import { ResponsiveContainer, RadialBarChart, RadialBar, Legend } from "recharts";
 import { Loader2, Sparkles, Trash2, Trophy } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -156,6 +165,8 @@ export function DigitalTwinPanel({ showHeader = true, initialValues, onApplyReci
   const [recipesLoading, setRecipesLoading] = useState(false);
   const [recipeActionLoadingId, setRecipeActionLoadingId] = useState<string | null>(null);
   const [recipeNotice, setRecipeNotice] = useState<string | null>(null);
+  const [recipeBulkDeleteDialogOpen, setRecipeBulkDeleteDialogOpen] = useState(false);
+  const [recipeBulkDeleting, setRecipeBulkDeleting] = useState(false);
 
   const perfectMessages = useMemo(
     () => [
@@ -397,6 +408,33 @@ export function DigitalTwinPanel({ showHeader = true, initialValues, onApplyReci
     4: t("roastMediumDark"),
     5: t("roastDark"),
   };
+
+  const recipeSelection = useBulkSelection(savedRecipes);
+
+  async function handleBulkDeleteRecipes() {
+    if (!supabase || !userId || recipeSelection.selectedCount === 0) return;
+
+    const ids = Array.from(recipeSelection.selectedIds);
+    const idSet = new Set(ids);
+
+    setRecipeBulkDeleting(true);
+    const { error } = await supabase
+      .from("brew_recipes")
+      .delete()
+      .in("id", ids)
+      .eq("user_id", userId);
+    setRecipeBulkDeleting(false);
+
+    if (error) {
+      setRecipeNotice(t("deleteRecipeError"));
+      return;
+    }
+
+    setSavedRecipes((prev) => prev.filter((recipe) => !idSet.has(recipe.id)));
+    setRecipeNotice(t("deleteRecipeSuccess"));
+    setRecipeBulkDeleteDialogOpen(false);
+    recipeSelection.exitSelectionMode();
+  }
 
   return (
     <div className="space-y-8">
@@ -673,7 +711,17 @@ export function DigitalTwinPanel({ showHeader = true, initialValues, onApplyReci
 
               <Card className="w-full">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base text-[var(--gray-dark)]">{t("savedRecipesTitle")}</CardTitle>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <CardTitle className="text-base text-[var(--gray-dark)]">{t("savedRecipesTitle")}</CardTitle>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={recipeSelection.toggleSelectionMode}
+                    >
+                      {recipeSelection.isSelectionMode ? t("selectionDone") : t("selectionEdit")}
+                    </Button>
+                  </div>
                   <CardDescription>{t("savedRecipesDescription")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2">
@@ -685,44 +733,105 @@ export function DigitalTwinPanel({ showHeader = true, initialValues, onApplyReci
                   ) : savedRecipes.length === 0 ? (
                     <p className="text-sm text-[var(--muted-foreground)]">{t("noSavedRecipes")}</p>
                   ) : (
-                    savedRecipes.map((recipe) => (
-                      <div
-                        key={recipe.id}
-                        className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-3"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="space-y-1">
-                            <p className="text-sm font-medium text-[var(--foreground)]">{recipe.recipe_name}</p>
-                            <p className="text-xs text-[var(--muted-foreground)]">
-                              {t("savedRecipeMeta", {
-                                temp: recipe.temperature,
-                                grind: recipe.grind_size,
-                                time: recipe.extraction_time,
-                                score: recipe.score,
-                              })}
-                            </p>
-                          </div>
-                          <div className="flex gap-1">
-                            <Button type="button" size="sm" variant="outline" onClick={() => handleApplyRecipe(recipe)}>
-                              {t("applyRecipe")}
-                            </Button>
-                            <Button
-                              type="button"
-                              size="icon"
-                              variant="ghost"
-                              onClick={() => handleDeleteRecipe(recipe.id)}
-                              disabled={recipeActionLoadingId === recipe.id}
-                            >
-                              {recipeActionLoadingId === recipe.id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <Trash2 className="h-4 w-4 text-rose-600" />
+                    <>
+                      {recipeSelection.isSelectionMode && (
+                        <div className="mb-2 flex flex-wrap items-center gap-2">
+                          <Button type="button" variant="outline" size="sm" onClick={recipeSelection.selectAll}>
+                            {t("selectionSelectAll")}
+                          </Button>
+                          <Button type="button" variant="outline" size="sm" onClick={recipeSelection.clearSelection}>
+                            {t("selectionClear")}
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            className="gap-1"
+                            onClick={() => setRecipeBulkDeleteDialogOpen(true)}
+                            disabled={!recipeSelection.hasSelection}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            {t("selectionDelete", { count: recipeSelection.selectedCount })}
+                          </Button>
+                        </div>
+                      )}
+
+                      {savedRecipes.map((recipe) => (
+                        <div
+                          key={recipe.id}
+                          className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-3"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-start gap-2">
+                              {recipeSelection.isSelectionMode && (
+                                <input
+                                  type="checkbox"
+                                  checked={recipeSelection.isSelected(recipe.id)}
+                                  onChange={() => recipeSelection.toggleItem(recipe.id)}
+                                  className="mt-1 h-4 w-4 rounded border-[var(--border)]"
+                                  aria-label={t("selectionItemAria")}
+                                />
                               )}
-                            </Button>
+                              <div className="space-y-1">
+                                <p className="text-sm font-medium text-[var(--foreground)]">{recipe.recipe_name}</p>
+                                <p className="text-xs text-[var(--muted-foreground)]">
+                                  {t("savedRecipeMeta", {
+                                    temp: recipe.temperature,
+                                    grind: recipe.grind_size,
+                                    time: recipe.extraction_time,
+                                    score: recipe.score,
+                                  })}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex gap-1">
+                              <Button type="button" size="sm" variant="outline" onClick={() => handleApplyRecipe(recipe)}>
+                                {t("applyRecipe")}
+                              </Button>
+                              {!recipeSelection.isSelectionMode && (
+                                <Button
+                                  type="button"
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={() => handleDeleteRecipe(recipe.id)}
+                                  disabled={recipeActionLoadingId === recipe.id}
+                                >
+                                  {recipeActionLoadingId === recipe.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Trash2 className="h-4 w-4 text-rose-600" />
+                                  )}
+                                </Button>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))
+                      ))}
+
+                      <Dialog open={recipeBulkDeleteDialogOpen} onOpenChange={setRecipeBulkDeleteDialogOpen}>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>{t("selectionDeleteTitle")}</DialogTitle>
+                            <DialogDescription>
+                              {t("selectionDeleteConfirm", { count: recipeSelection.selectedCount })}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <DialogFooter>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => setRecipeBulkDeleteDialogOpen(false)}
+                              disabled={recipeBulkDeleting}
+                            >
+                              {t("dialogCancel")}
+                            </Button>
+                            <Button type="button" onClick={handleBulkDeleteRecipes} disabled={recipeBulkDeleting}>
+                              {recipeBulkDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                              {t("dialogDelete")}
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </>
                   )}
                 </CardContent>
               </Card>

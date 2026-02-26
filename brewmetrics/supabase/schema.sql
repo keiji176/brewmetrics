@@ -103,6 +103,12 @@ create table if not exists public.bean_profiles (
 );
 
 alter table public.bean_profiles add column if not exists variety text;
+alter table public.bean_profiles add column if not exists bean_name text;
+alter table public.bean_profiles add column if not exists roaster text;
+alter table public.bean_profiles add column if not exists origin text;
+alter table public.bean_profiles add column if not exists roast_level text;
+alter table public.bean_profiles add column if not exists process text;
+alter table public.bean_profiles add column if not exists created_at timestamptz default now() not null;
 alter table public.bean_profiles enable row level security;
 
 drop policy if exists "Users can read own bean_profiles" on public.bean_profiles;
@@ -146,6 +152,16 @@ create table if not exists public.brew_records (
 );
 
 alter table public.brew_records add column if not exists variety text;
+alter table public.brew_records add column if not exists bean_name text;
+alter table public.brew_records add column if not exists roaster text;
+alter table public.brew_records add column if not exists grind_size text;
+alter table public.brew_records add column if not exists temperature numeric;
+alter table public.brew_records add column if not exists coffee_weight numeric;
+alter table public.brew_records add column if not exists water_weight numeric;
+alter table public.brew_records add column if not exists brew_time numeric;
+alter table public.brew_records add column if not exists score numeric;
+alter table public.brew_records add column if not exists notes text;
+alter table public.brew_records add column if not exists created_at timestamptz default now() not null;
 alter table public.brew_records enable row level security;
 
 drop policy if exists "Users can read own brew_records" on public.brew_records;

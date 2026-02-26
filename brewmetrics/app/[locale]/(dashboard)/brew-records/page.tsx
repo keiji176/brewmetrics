@@ -24,6 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { AICoachPanel } from "@/components/ai-coach/AICoachPanel";
 import { DigitalTwinPanel } from "@/components/digital-twin/DigitalTwinPanel";
 import { GlossaryHelpTooltip } from "@/components/help/GlossaryHelpTooltip";
+import { useBulkSelection } from "@/hooks/useBulkSelection";
 import type { BrewRecipeRow } from "@/lib/supabase/types";
 import { Coffee, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -89,6 +90,8 @@ export default function BrewRecordsPage() {
   const [varietyFilter, setVarietyFilter] = useState("all");
   const [varietySort, setVarietySort] = useState<"none" | "az" | "za">("none");
   const [activeTab, setActiveTab] = useState<BrewRecordsTab>("record");
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
 
   const varietyOptions = ["Geisha", "Typica", "Bourbon", "Caturra", "Pacamara", "SL28"];
 
@@ -291,6 +294,31 @@ export default function BrewRecordsPage() {
     });
   }, [records, searchQuery, varietyFilter, varietySort]);
 
+  const selection = useBulkSelection(filteredRecords);
+
+  async function handleBulkDelete() {
+    if (!supabase || selection.selectedCount === 0) return;
+
+    const ids = Array.from(selection.selectedIds);
+    const idSet = new Set(ids);
+
+    setBulkDeleting(true);
+    const { error: deleteError } = await supabase
+      .from("brew_records")
+      .delete()
+      .in("id", ids);
+    setBulkDeleting(false);
+
+    if (deleteError) {
+      setError(deleteError.message);
+      return;
+    }
+
+    setRecords((prev) => prev.filter((record) => !idSet.has(record.id)));
+    setBulkDeleteDialogOpen(false);
+    selection.exitSelectionMode();
+  }
+
   const varietyValues = useMemo(() => {
     return Array.from(
       new Set(records.map((record) => record.variety?.trim()).filter((value): value is string => Boolean(value)))
@@ -306,14 +334,24 @@ export default function BrewRecordsPage() {
           </h1>
           <p className="mt-1 text-sm text-[var(--muted-foreground)]">{t("description")}</p>
         </div>
-        <Button
-          onClick={openCreate}
-          className="gap-2"
-          disabled={!userId || activeTab !== "record"}
-        >
-          <Plus className="h-4 w-4" />
-          {t("addRecord")}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={openCreate}
+            className="gap-2"
+            disabled={!userId || activeTab !== "record" || selection.isSelectionMode}
+          >
+            <Plus className="h-4 w-4" />
+            {t("addRecord")}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={selection.toggleSelectionMode}
+            disabled={activeTab !== "record"}
+          >
+            {selection.isSelectionMode ? t("selectionDone") : t("selectionEdit")}
+          </Button>
+        </div>
       </div>
 
       <div className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] p-1">
@@ -330,7 +368,11 @@ export default function BrewRecordsPage() {
         </button>
         <button
           type="button"
-          onClick={() => setActiveTab("analysis")}
+          onClick={() => {
+            selection.exitSelectionMode();
+            setBulkDeleteDialogOpen(false);
+            setActiveTab("analysis");
+          }}
           className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
             activeTab === "analysis"
               ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
@@ -657,6 +699,29 @@ export default function BrewRecordsPage() {
 
       <AICoachPanel context="brew" entries={records} />
 
+      {selection.isSelectionMode && !loading && records.length > 0 && (
+        <Card>
+          <CardContent className="flex flex-wrap items-center gap-2 py-4">
+            <Button type="button" variant="outline" size="sm" onClick={selection.selectAll}>
+              {t("selectionSelectAll")}
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={selection.clearSelection}>
+              {t("selectionClear")}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              className="gap-1"
+              onClick={() => setBulkDeleteDialogOpen(true)}
+              disabled={!selection.hasSelection}
+            >
+              <Trash2 className="h-4 w-4" />
+              {t("selectionDelete", { count: selection.selectedCount })}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {error && (
         <Card className="border-rose-200 bg-rose-50/50">
           <CardContent className="py-4">
@@ -694,32 +759,45 @@ export default function BrewRecordsPage() {
           {filteredRecords.map((record) => (
             <Card key={record.id} className="overflow-hidden">
               <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-                <div className="space-y-1">
-                  <CardTitle className="text-base font-medium text-[var(--gray-dark)]">
-                    {record.bean_name || t("unnamed")}
-                  </CardTitle>
-                  {record.roaster && (
-                    <CardDescription>{record.roaster}</CardDescription>
+                <div className="flex items-start gap-2">
+                  {selection.isSelectionMode && (
+                    <input
+                      type="checkbox"
+                      checked={selection.isSelected(record.id)}
+                      onChange={() => selection.toggleItem(record.id)}
+                      className="mt-1 h-4 w-4 rounded border-[var(--border)]"
+                      aria-label={t("selectionItemAria")}
+                    />
                   )}
+                  <div className="space-y-1">
+                    <CardTitle className="text-base font-medium text-[var(--gray-dark)]">
+                      {record.bean_name || t("unnamed")}
+                    </CardTitle>
+                    {record.roaster && (
+                      <CardDescription>{record.roaster}</CardDescription>
+                    )}
+                  </div>
                 </div>
-                <div className="flex gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => openEdit(record)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-rose-600 hover:text-rose-700"
-                    onClick={() => handleDelete(record.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+                {!selection.isSelectionMode && (
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => openEdit(record)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-rose-600 hover:text-rose-700"
+                      onClick={() => handleDelete(record.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
               </CardHeader>
               <CardContent className="space-y-1 text-sm">
                 {record.variety && (
@@ -768,6 +846,31 @@ export default function BrewRecordsPage() {
           ))}
         </div>
       )}
+
+      <Dialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("selectionDeleteTitle")}</DialogTitle>
+            <DialogDescription>
+              {t("selectionDeleteConfirm", { count: selection.selectedCount })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setBulkDeleteDialogOpen(false)}
+              disabled={bulkDeleting}
+            >
+              {tCommon("cancel")}
+            </Button>
+            <Button type="button" onClick={handleBulkDelete} disabled={bulkDeleting}>
+              {bulkDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {tCommon("delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
         </>
       ) : (
         <div className="space-y-6">

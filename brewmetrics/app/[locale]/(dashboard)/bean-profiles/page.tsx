@@ -21,6 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useBulkSelection } from "@/hooks/useBulkSelection";
 import { Coffee, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -51,6 +52,8 @@ export default function BeanProfilesPage() {
   const [form, setForm] = useState(emptyRecord(""));
   const [varietyFilter, setVarietyFilter] = useState("all");
   const [varietySort, setVarietySort] = useState<VarietySort>("none");
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
 
   const supabase = createClient();
 
@@ -180,6 +183,28 @@ export default function BeanProfilesPage() {
     return next;
   }, [records, varietyFilter, varietySort]);
 
+  const selection = useBulkSelection(displayedRecords);
+
+  async function handleBulkDelete() {
+    if (!supabase || selection.selectedCount === 0) return;
+
+    const ids = Array.from(selection.selectedIds);
+    const idSet = new Set(ids);
+
+    setBulkDeleting(true);
+    const { error: e } = await supabase.from("bean_profiles").delete().in("id", ids);
+    setBulkDeleting(false);
+
+    if (e) {
+      setError(e.message);
+      return;
+    }
+
+    setRecords((prev) => prev.filter((record) => !idSet.has(record.id)));
+    setBulkDeleteDialogOpen(false);
+    selection.exitSelectionMode();
+  }
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -189,10 +214,15 @@ export default function BeanProfilesPage() {
           </h1>
           <p className="mt-1 text-sm text-[var(--muted-foreground)]">{t("description")}</p>
         </div>
-        <Button onClick={openCreate} className="gap-2" disabled={!userId}>
-          <Plus className="h-4 w-4" />
-          {t("addRecord")}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={openCreate} className="gap-2" disabled={!userId || selection.isSelectionMode}>
+            <Plus className="h-4 w-4" />
+            {t("addRecord")}
+          </Button>
+          <Button type="button" variant="outline" onClick={selection.toggleSelectionMode}>
+            {selection.isSelectionMode ? t("selectionDone") : t("selectionEdit")}
+          </Button>
+        </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent>
             <DialogHeader>
@@ -316,6 +346,29 @@ export default function BeanProfilesPage() {
         </Card>
       ) : (
         <>
+          {selection.isSelectionMode && (
+            <Card>
+              <CardContent className="flex flex-wrap items-center gap-2 py-4">
+                <Button type="button" variant="outline" size="sm" onClick={selection.selectAll}>
+                  {t("selectionSelectAll")}
+                </Button>
+                <Button type="button" variant="outline" size="sm" onClick={selection.clearSelection}>
+                  {t("selectionClear")}
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="gap-1"
+                  onClick={() => setBulkDeleteDialogOpen(true)}
+                  disabled={!selection.hasSelection}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  {t("selectionDelete", { count: selection.selectedCount })}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
           <div className="grid max-w-2xl gap-3 sm:grid-cols-2">
             <div className="grid gap-1.5">
               <Label htmlFor="bean-variety-filter" className="text-xs text-[var(--muted-foreground)]">
@@ -356,27 +409,40 @@ export default function BeanProfilesPage() {
           {displayedRecords.map((record) => (
             <Card key={record.id} className="overflow-hidden">
               <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-                <CardTitle className="text-base font-medium text-[var(--gray-dark)]">
-                  {record.bean_name || t("unnamed")}
-                </CardTitle>
-                <div className="flex gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => openEdit(record)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-rose-600 hover:text-rose-700"
-                    onClick={() => handleDelete(record.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                <div className="flex items-start gap-2">
+                  {selection.isSelectionMode && (
+                    <input
+                      type="checkbox"
+                      checked={selection.isSelected(record.id)}
+                      onChange={() => selection.toggleItem(record.id)}
+                      className="mt-1 h-4 w-4 rounded border-[var(--border)]"
+                      aria-label={t("selectionItemAria")}
+                    />
+                  )}
+                  <CardTitle className="text-base font-medium text-[var(--gray-dark)]">
+                    {record.bean_name || t("unnamed")}
+                  </CardTitle>
                 </div>
+                {!selection.isSelectionMode && (
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => openEdit(record)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-rose-600 hover:text-rose-700"
+                      onClick={() => handleDelete(record.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
               </CardHeader>
               <CardContent className="space-y-1 text-sm">
                 {record.variety && (
@@ -401,6 +467,31 @@ export default function BeanProfilesPage() {
             </Card>
           ))}
         </div>
+
+        <Dialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{t("selectionDeleteTitle")}</DialogTitle>
+              <DialogDescription>
+                {t("selectionDeleteConfirm", { count: selection.selectedCount })}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setBulkDeleteDialogOpen(false)}
+                disabled={bulkDeleting}
+              >
+                {tCommon("cancel")}
+              </Button>
+              <Button type="button" onClick={handleBulkDelete} disabled={bulkDeleting}>
+                {bulkDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                {tCommon("delete")}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         </>
       )}
     </div>
