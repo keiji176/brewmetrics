@@ -7,6 +7,7 @@ import { GrindSize } from "@/lib/supabase/types";
 import { Link } from "@/i18n/navigation";
 import { GlossaryHelpTooltip } from "@/components/help/GlossaryHelpTooltip";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ResponsiveContainer, RadialBarChart, RadialBar, Legend } from "recharts";
@@ -270,6 +271,19 @@ export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTw
 
   const gaugeData = [{ name: t("quality"), value: score, fill: scoreGaugeFill }];
 
+  function handleSaveRecipe() {
+    const currentSettings = {
+      roastLevel,
+      temperature,
+      extractionTime,
+      grindSize: effectiveGrindSize,
+      score,
+      selectedCalibrationId: selectedCalibrationId || null,
+      clickInput: clickInput ? Number(clickInput) : null,
+    };
+    console.log("レシピを保存しました:", currentSettings);
+  }
+
   const grindLabelMap: Record<GrindSize, string> = {
     [GrindSize.FINE]: t("grindFine"),
     [GrindSize.MEDIUM_FINE]: t("grindMediumFine"),
@@ -494,6 +508,11 @@ export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTw
                   <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                   {t("perfectScoreBadge")}
                 </p>
+              )}
+              {score >= 95 && (
+                <Button type="button" onClick={handleSaveRecipe} className="-mt-2">
+                  {t("saveRecipeCta")}
+                </Button>
               )}
               <div className="h-[240px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
