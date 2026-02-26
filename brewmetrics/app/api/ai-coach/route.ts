@@ -1,5 +1,5 @@
 import { google } from "@ai-sdk/google";
-import { generateText, streamText } from "ai";
+import { streamText } from "ai";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -29,40 +29,6 @@ function normalizeEntry(entry: CoachEntry) {
     notes: entry.notes ?? "",
     created_at: entry.created_at ?? "",
   };
-}
-
-function isModelUnavailableError(error: unknown) {
-  const message = error instanceof Error ? error.message : String(error);
-  return (
-    message.includes("is not found for API version") ||
-    message.includes("is not supported for generateContent") ||
-    message.includes("models/")
-  );
-}
-
-async function resolveAvailableModel(modelCandidates: string[]) {
-  let lastError: unknown;
-
-  for (const modelName of modelCandidates) {
-    try {
-      await generateText({
-        model: google(modelName),
-        maxTokens: 1,
-        temperature: 0,
-        prompt: "ping",
-      });
-      return modelName;
-    } catch (error) {
-      lastError = error;
-      if (!isModelUnavailableError(error)) {
-        throw error;
-      }
-    }
-  }
-
-  throw lastError instanceof Error
-    ? lastError
-    : new Error("No available Gemini model found for generateContent.");
 }
 
 export async function POST(req: Request) {
@@ -106,19 +72,8 @@ export async function POST(req: Request) {
       "\n\n" +
       userPrompt;
 
-    const preferredModel = process.env.GOOGLE_GENERATIVE_AI_MODEL?.trim();
-    const modelCandidates = [
-      preferredModel,
-      "gemini-1.5-flash-latest",
-      "gemini-1.5-flash",
-      "gemini-2.0-flash",
-      "gemini-1.0-pro",
-    ].filter((modelName): modelName is string => Boolean(modelName));
-
-    const modelName = await resolveAvailableModel(modelCandidates);
-
     const result = streamText({
-      model: google(modelName),
+      model: google("gemini-1.5-flash"),
       maxTokens: 240,
       temperature: 0.4,
       system: systemPrompt,
