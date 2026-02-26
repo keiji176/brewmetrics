@@ -20,14 +20,16 @@ export function GlossaryHelpTooltip({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <button
-          type="button"
+        <Link
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
           aria-label={buttonLabel}
-          className="inline-flex h-5 w-5 items-center justify-center rounded-full text-[var(--muted-foreground)] transition hover:bg-[var(--muted)] hover:text-[var(--primary)]"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full p-2 -m-2 text-[var(--muted-foreground)] transition hover:bg-[var(--muted)] hover:text-[var(--primary)]"
         >
           <CircleHelp className="h-4 w-4" />
           <span className="sr-only">{buttonLabel}</span>
-        </button>
+        </Link>
       </TooltipTrigger>
       <TooltipContent>
         <div className="space-y-2">

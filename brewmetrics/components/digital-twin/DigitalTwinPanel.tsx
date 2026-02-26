@@ -506,7 +506,15 @@ export function DigitalTwinPanel({ showHeader = true, initialValues, onApplyReci
             <div className="space-y-2 rounded-lg border border-[var(--border)] bg-[var(--card)] p-4">
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="grid gap-2">
-                  <Label htmlFor="grinder-select">{t("grinderSelect")}</Label>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="grinder-select">{t("grinderSelect")}</Label>
+                    <GlossaryHelpTooltip
+                      href="/glossary?category=basics#grindSize"
+                      description={t("tooltipGrindSize")}
+                      buttonLabel={t("glossaryLink")}
+                      learnMoreLabel={t("tooltipSeeMore")}
+                    />
+                  </div>
                   <select
                     id="grinder-select"
                     value={selectedCalibrationId}
