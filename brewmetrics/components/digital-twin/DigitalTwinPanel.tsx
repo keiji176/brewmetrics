@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { GrinderCalibrationRow } from "@/lib/supabase/types";
+import type { BrewRecipeRow, GrinderCalibrationRow } from "@/lib/supabase/types";
 import { GrindSize } from "@/lib/supabase/types";
 import { Link } from "@/i18n/navigation";
 import { GlossaryHelpTooltip } from "@/components/help/GlossaryHelpTooltip";
@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ResponsiveContainer, RadialBarChart, RadialBar, Legend } from "recharts";
-import { Sparkles, Trophy } from "lucide-react";
+import { Loader2, Sparkles, Trash2, Trophy } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 type RoastLevel = 1 | 2 | 3 | 4 | 5;
@@ -88,6 +88,7 @@ interface DigitalTwinPanelProps {
     extractionTime?: number | null;
     grindSize?: string | null;
   };
+  onApplyRecipe?: (recipe: BrewRecipeRow) => void;
 }
 
 function normalizeGrindSize(input?: string | null): GrindSize | null {
@@ -137,7 +138,7 @@ function normalizeGrindSize(input?: string | null): GrindSize | null {
   return null;
 }
 
-export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTwinPanelProps) {
+export function DigitalTwinPanel({ showHeader = true, initialValues, onApplyRecipe }: DigitalTwinPanelProps) {
   const t = useTranslations("digitalTwin");
   const supabase = createClient();
   const wasPerfectScoreRef = useRef(false);
@@ -151,6 +152,10 @@ export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTw
   const [selectedCalibrationId, setSelectedCalibrationId] = useState("");
   const [clickInput, setClickInput] = useState("");
   const [perfectMessage, setPerfectMessage] = useState<string | null>(null);
+  const [savedRecipes, setSavedRecipes] = useState<BrewRecipeRow[]>([]);
+  const [recipesLoading, setRecipesLoading] = useState(false);
+  const [recipeActionLoadingId, setRecipeActionLoadingId] = useState<string | null>(null);
+  const [recipeNotice, setRecipeNotice] = useState<string | null>(null);
 
   const perfectMessages = useMemo(
     () => [
@@ -205,6 +210,24 @@ export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTw
         if (rows.length > 0) setSelectedCalibrationId(rows[0].id);
       });
   }, [supabase, userId]);
+
+  useEffect(() => {
+    if (!supabase || !userId) return;
+
+    setRecipesLoading(true);
+    supabase
+      .from("brew_recipes")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .then(({ data, error }) => {
+        setRecipesLoading(false);
+        if (error) {
+          setRecipeNotice(t("saveRecipeLoadError"));
+          return;
+        }
+        setSavedRecipes((data as BrewRecipeRow[]) ?? []);
+      });
+  }, [supabase, userId, t]);
 
   const selectedCalibration = useMemo(
     () => calibrations.find((item) => item.id === selectedCalibrationId) ?? null,
@@ -271,7 +294,12 @@ export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTw
 
   const gaugeData = [{ name: t("quality"), value: score, fill: scoreGaugeFill }];
 
-  function handleSaveRecipe() {
+  async function handleSaveRecipe() {
+    if (!supabase || !userId) {
+      setRecipeNotice(t("saveRecipeError"));
+      return;
+    }
+
     const currentSettings = {
       roastLevel,
       temperature,
@@ -281,7 +309,77 @@ export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTw
       selectedCalibrationId: selectedCalibrationId || null,
       clickInput: clickInput ? Number(clickInput) : null,
     };
+
+    setRecipeActionLoadingId("save");
+
+    const { data, error } = await supabase
+      .from("brew_recipes")
+      .insert({
+        user_id: userId,
+        recipe_name: t("savedRecipeName", { score: score.toFixed(1) }),
+        roast_level: roastLevel,
+        temperature,
+        extraction_time: extractionTime,
+        grind_size: effectiveGrindSize,
+        score,
+        selected_calibration_id: selectedCalibrationId || null,
+        click_input: clickInput ? Number(clickInput) : null,
+      })
+      .select()
+      .single();
+
+    setRecipeActionLoadingId(null);
+
+    if (error) {
+      setRecipeNotice(t("saveRecipeError"));
+      return;
+    }
+
+    if (data) {
+      setSavedRecipes((prev) => [data as BrewRecipeRow, ...prev]);
+      setRecipeNotice(t("saveRecipeSuccess"));
+    }
+
     console.log("レシピを保存しました:", currentSettings);
+  }
+
+  async function handleDeleteRecipe(recipeId: string) {
+    if (!supabase || !userId) return;
+    if (!confirm(t("deleteRecipeConfirm"))) return;
+
+    setRecipeActionLoadingId(recipeId);
+    const { error } = await supabase
+      .from("brew_recipes")
+      .delete()
+      .eq("id", recipeId)
+      .eq("user_id", userId);
+    setRecipeActionLoadingId(null);
+
+    if (error) {
+      setRecipeNotice(t("deleteRecipeError"));
+      return;
+    }
+
+    setSavedRecipes((prev) => prev.filter((recipe) => recipe.id !== recipeId));
+    setRecipeNotice(t("deleteRecipeSuccess"));
+  }
+
+  function handleApplyRecipe(recipe: BrewRecipeRow) {
+    const mappedGrind = normalizeGrindSize(recipe.grind_size);
+    if (mappedGrind) {
+      setManualGrindSize(mappedGrind);
+    }
+
+    setTemperature(Number(recipe.temperature));
+    setExtractionTime(Number(recipe.extraction_time));
+
+    if (recipe.selected_calibration_id) {
+      setSelectedCalibrationId(recipe.selected_calibration_id);
+    }
+
+    setClickInput(recipe.click_input != null ? String(recipe.click_input) : "");
+    setRecipeNotice(t("applyRecipeSuccess", { name: recipe.recipe_name }));
+    onApplyRecipe?.(recipe);
   }
 
   const grindLabelMap: Record<GrindSize, string> = {
@@ -510,9 +608,13 @@ export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTw
                 </p>
               )}
               {score >= 95 && (
-                <Button type="button" onClick={handleSaveRecipe} className="-mt-2">
+                <Button type="button" onClick={handleSaveRecipe} className="-mt-2" disabled={recipeActionLoadingId === "save"}>
+                  {recipeActionLoadingId === "save" ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                   {t("saveRecipeCta")}
                 </Button>
+              )}
+              {recipeNotice && (
+                <p className="-mt-2 text-xs text-[var(--muted-foreground)]">{recipeNotice}</p>
               )}
               <div className="h-[240px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -557,6 +659,62 @@ export function DigitalTwinPanel({ showHeader = true, initialValues }: DigitalTw
                     </p>
                   ) : (
                     <p className="text-sm leading-relaxed text-[var(--foreground)]">{t(scoreFeedbackKey)}</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card className="w-full">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base text-[var(--gray-dark)]">{t("savedRecipesTitle")}</CardTitle>
+                  <CardDescription>{t("savedRecipesDescription")}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {recipesLoading ? (
+                    <div className="flex items-center gap-2 text-sm text-[var(--muted-foreground)]">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      {t("loadingSavedRecipes")}
+                    </div>
+                  ) : savedRecipes.length === 0 ? (
+                    <p className="text-sm text-[var(--muted-foreground)]">{t("noSavedRecipes")}</p>
+                  ) : (
+                    savedRecipes.map((recipe) => (
+                      <div
+                        key={recipe.id}
+                        className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-3"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="space-y-1">
+                            <p className="text-sm font-medium text-[var(--foreground)]">{recipe.recipe_name}</p>
+                            <p className="text-xs text-[var(--muted-foreground)]">
+                              {t("savedRecipeMeta", {
+                                temp: recipe.temperature,
+                                grind: recipe.grind_size,
+                                time: recipe.extraction_time,
+                                score: recipe.score,
+                              })}
+                            </p>
+                          </div>
+                          <div className="flex gap-1">
+                            <Button type="button" size="sm" variant="outline" onClick={() => handleApplyRecipe(recipe)}>
+                              {t("applyRecipe")}
+                            </Button>
+                            <Button
+                              type="button"
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => handleDeleteRecipe(recipe.id)}
+                              disabled={recipeActionLoadingId === recipe.id}
+                            >
+                              {recipeActionLoadingId === recipe.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4 text-rose-600" />
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))
                   )}
                 </CardContent>
               </Card>

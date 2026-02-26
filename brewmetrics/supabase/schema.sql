@@ -171,6 +171,47 @@ create policy "Users can delete own brew_records"
 create index if not exists brew_records_user_id_created_at_idx
   on public.brew_records (user_id, created_at desc);
 
+-- Brew recipes (saved from simulation)
+create table if not exists public.brew_recipes (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users (id) on delete cascade not null,
+  recipe_name text not null,
+  roast_level integer not null check (roast_level between 1 and 5),
+  temperature numeric not null,
+  extraction_time numeric not null,
+  grind_size text not null,
+  score numeric not null,
+  selected_calibration_id uuid references public.grinder_calibrations (id) on delete set null,
+  click_input integer,
+  created_at timestamptz default now() not null,
+  updated_at timestamptz default now() not null
+);
+
+alter table public.brew_recipes enable row level security;
+
+drop policy if exists "Users can read own brew_recipes" on public.brew_recipes;
+create policy "Users can read own brew_recipes"
+  on public.brew_recipes for select
+  using (auth.uid() = user_id);
+
+drop policy if exists "Users can insert own brew_recipes" on public.brew_recipes;
+create policy "Users can insert own brew_recipes"
+  on public.brew_recipes for insert
+  with check (auth.uid() = user_id);
+
+drop policy if exists "Users can update own brew_recipes" on public.brew_recipes;
+create policy "Users can update own brew_recipes"
+  on public.brew_recipes for update
+  using (auth.uid() = user_id);
+
+drop policy if exists "Users can delete own brew_recipes" on public.brew_recipes;
+create policy "Users can delete own brew_recipes"
+  on public.brew_recipes for delete
+  using (auth.uid() = user_id);
+
+create index if not exists brew_recipes_user_id_created_at_idx
+  on public.brew_recipes (user_id, created_at desc);
+
 -- Grinder calibration
 create table if not exists public.grinder_calibrations (
   id uuid default gen_random_uuid() primary key,

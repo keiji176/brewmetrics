@@ -24,6 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { AICoachPanel } from "@/components/ai-coach/AICoachPanel";
 import { DigitalTwinPanel } from "@/components/digital-twin/DigitalTwinPanel";
 import { GlossaryHelpTooltip } from "@/components/help/GlossaryHelpTooltip";
+import type { BrewRecipeRow } from "@/lib/supabase/types";
 import { Coffee, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -130,6 +131,19 @@ export default function BrewRecordsPage() {
   function openCreate() {
     setEditing(null);
     setForm(emptyForm);
+    setDialogOpen(true);
+  }
+
+  function applyRecipeToForm(recipe: BrewRecipeRow) {
+    setEditing(null);
+    setForm((current) => ({
+      ...current,
+      grind_size: recipe.grind_size,
+      temperature: Number(recipe.temperature),
+      brew_time: Number(recipe.extraction_time),
+      notes: current.notes || `${recipe.recipe_name}`,
+    }));
+    setActiveTab("record");
     setDialogOpen(true);
   }
 
@@ -767,6 +781,7 @@ export default function BrewRecordsPage() {
               extractionTime: form.brew_time,
               grindSize: form.grind_size,
             }}
+            onApplyRecipe={applyRecipeToForm}
           />
         </div>
       )}

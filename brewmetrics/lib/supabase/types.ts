@@ -192,6 +192,50 @@ export interface Database {
           created_at?: string;
         };
       };
+      brew_recipes: {
+        Row: {
+          id: string;
+          user_id: string;
+          recipe_name: string;
+          roast_level: number;
+          temperature: number;
+          extraction_time: number;
+          grind_size: string;
+          score: number;
+          selected_calibration_id: string | null;
+          click_input: number | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          recipe_name: string;
+          roast_level: number;
+          temperature: number;
+          extraction_time: number;
+          grind_size: string;
+          score: number;
+          selected_calibration_id?: string | null;
+          click_input?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          recipe_name?: string;
+          roast_level?: number;
+          temperature?: number;
+          extraction_time?: number;
+          grind_size?: string;
+          score?: number;
+          selected_calibration_id?: string | null;
+          click_input?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
   };
 }
@@ -214,3 +258,5 @@ export type UserGearRow = Database["public"]["Tables"]["user_gears"]["Row"];
 export type UserGearInsert = Database["public"]["Tables"]["user_gears"]["Insert"];
 export type UserCustomGearRow = Database["public"]["Tables"]["user_custom_gears"]["Row"];
 export type UserCustomGearInsert = Database["public"]["Tables"]["user_custom_gears"]["Insert"];
+export type BrewRecipeRow = Database["public"]["Tables"]["brew_recipes"]["Row"];
+export type BrewRecipeInsert = Database["public"]["Tables"]["brew_recipes"]["Insert"];
