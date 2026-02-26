@@ -1,5 +1,5 @@
 import { google } from "@ai-sdk/google";
-import { generateText } from "ai";
+import { generateText, streamText } from "ai";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -29,6 +29,40 @@ function normalizeEntry(entry: CoachEntry) {
     notes: entry.notes ?? "",
     created_at: entry.created_at ?? "",
   };
+}
+
+function isModelUnavailableError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  return (
+    message.includes("is not found for API version") ||
+    message.includes("is not supported for generateContent") ||
+    message.includes("models/")
+  );
+}
+
+async function resolveAvailableModel(modelCandidates: string[]) {
+  let lastError: unknown;
+
+  for (const modelName of modelCandidates) {
+    try {
+      await generateText({
+        model: google(modelName),
+        maxTokens: 1,
+        temperature: 0,
+        prompt: "ping",
+      });
+      return modelName;
+    } catch (error) {
+      lastError = error;
+      if (!isModelUnavailableError(error)) {
+        throw error;
+      }
+    }
+  }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("No available Gemini model found for generateContent.");
 }
 
 export async function POST(req: Request) {
@@ -65,38 +99,33 @@ export async function POST(req: Request) {
 
     const userPrompt = JSON.stringify({ context, entries }, null, 2);
 
-    const requestPayload = {
+    const prompt =
+      (locale === "ja"
+        ? "以下の記録データを分析し、次回もっと美味しくするための具体的アドバイスをください。"
+        : "Analyze the following records and give concrete suggestions for the next better cup.") +
+      "\n\n" +
+      userPrompt;
+
+    const preferredModel = process.env.GOOGLE_GENERATIVE_AI_MODEL?.trim();
+    const modelCandidates = [
+      preferredModel,
+      "gemini-1.5-flash-latest",
+      "gemini-1.5-flash",
+      "gemini-2.0-flash",
+      "gemini-1.0-pro",
+    ].filter((modelName): modelName is string => Boolean(modelName));
+
+    const modelName = await resolveAvailableModel(modelCandidates);
+
+    const result = streamText({
+      model: google(modelName),
       maxTokens: 240,
       temperature: 0.4,
       system: systemPrompt,
-      messages: [
-        {
-          role: "user" as const,
-          content:
-            (locale === "ja"
-              ? "以下の記録データを分析し、次回もっと美味しくするための具体的アドバイスをください。"
-              : "Analyze the following records and give concrete suggestions for the next better cup.") +
-            "\n\n" +
-            userPrompt,
-        },
-      ],
-    };
-
-    const response = await generateText({
-      model: google("gemini-1.5-flash"),
-      ...requestPayload,
+      prompt,
     });
 
-    const advice = response.text.trim();
-
-    if (!advice) {
-      return NextResponse.json(
-        { error: "Failed to generate advice." },
-        { status: 502 }
-      );
-    }
-
-    return NextResponse.json({ advice });
+    return result.toTextStreamResponse();
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ error: message }, { status: 500 });

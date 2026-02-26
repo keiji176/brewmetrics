@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "@radix-ui/react-tooltip": "^1.2.8"
+    "@ai-sdk/google": "^3.0.31",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "ai": "^6.0.101"
   }
 }

@@ -51,10 +51,29 @@ export function AICoachPanel({ context, entries }: AICoachPanelProps) {
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Request failed");
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error ?? "Request failed");
+      }
 
-      setAdvice(data.advice ?? null);
+      if (!res.body) {
+        throw new Error("Streaming response body is empty.");
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        fullText += decoder.decode(value, { stream: true });
+        setAdvice(fullText);
+      }
+
+      fullText += decoder.decode();
+      setAdvice(fullText.trim() || null);
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Unknown error");
     } finally {
