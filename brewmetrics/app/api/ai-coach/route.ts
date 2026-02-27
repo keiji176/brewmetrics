@@ -1,5 +1,5 @@
 import { google } from "@ai-sdk/google";
-import { generateText } from "ai";
+import { streamText } from "ai";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -60,8 +60,8 @@ export async function POST(req: Request) {
 
     const systemPrompt =
       locale === "ja"
-        ? "あなたはプロのバリスタ兼抽出コーチです。必ず安全で実践的な提案を日本語で返してください。出力は2〜4文、簡潔に。具体的に次回試す調整値を1つ以上入れてください。"
-        : "You are a professional barista and brew coach. Return concise, practical advice in 2-4 sentences. Include at least one concrete next adjustment value for the next brew.";
+        ? "あなたはプロのバリスタ兼抽出コーチです。必ず安全で実践的な提案を日本語で返してください。出力は2〜4文、簡潔に。具体的に次回試す調整値を1つ以上入れてください。回答は通常の日本語文章（Markdown可）で直接記述し、JSONやキー名、コードブロックなどのデータ構造は絶対に含めないでください。"
+        : "You are a professional barista and brew coach. Return concise, practical advice in 2-4 sentences. Include at least one concrete next adjustment value for the next brew. Respond in plain natural language text (Markdown allowed), and never output JSON, object keys, or code blocks.";
 
     const userPrompt = JSON.stringify({ context, entries }, null, 2);
 
@@ -85,32 +85,32 @@ export async function POST(req: Request) {
 
     for (const modelName of candidateModels) {
       try {
-        const { text } = await generateText({
+        const result = streamText({
           model: google(modelName),
           system: systemPrompt,
           temperature: 0.4,
           maxOutputTokens: 240,
           prompt: promptText,
         });
-        advice = text.trim();
-        if (advice) break;
+
+        return result.toTextStreamResponse({
+          headers: {
+            "Cache-Control": "no-cache",
+          },
+        });
       } catch (error) {
         lastError = error;
       }
     }
 
-    if (!advice && lastError) {
+    if (lastError) {
       throw lastError;
     }
 
-    if (!advice) {
-      return NextResponse.json(
-        { error: "Failed to generate advice." },
-        { status: 502 }
-      );
-    }
-
-    return NextResponse.json({ advice });
+    return NextResponse.json(
+      { error: "Failed to generate advice." },
+      { status: 502 }
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ error: message }, { status: 500 });
