@@ -89,7 +89,6 @@ export async function POST(req: Request) {
           model: google(modelName),
           system: systemPrompt,
           temperature: 0.4,
-          maxOutputTokens: 420,
           prompt: promptText,
         });
 
