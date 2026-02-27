@@ -60,8 +60,8 @@ export async function POST(req: Request) {
 
     const systemPrompt =
       locale === "ja"
-        ? "あなたはプロのバリスタ兼抽出コーチです。必ず安全で実践的な提案を日本語で返してください。出力は2〜4文、簡潔に。具体的に次回試す調整値を1つ以上入れてください。回答は通常の日本語文章（Markdown可）で直接記述し、JSONやキー名、コードブロックなどのデータ構造は絶対に含めないでください。"
-        : "You are a professional barista and brew coach. Return concise, practical advice in 2-4 sentences. Include at least one concrete next adjustment value for the next brew. Respond in plain natural language text (Markdown allowed), and never output JSON, object keys, or code blocks.";
+        ? "あなたは専属のプロフェッショナル・バリスタコーチです。提供されたユーザーのコーヒー抽出記録（豆の品種、挽き目、湯温、粉量、注湯量、時間、スコアなど）を分析し、次の一杯をより美味しくするための具体的な改善アクションを提案してください。出力は必ず自然な日本語の文章（Markdown形式）で、1行目から次の2つの見出しをこの順番で含めてください：『☕️ 今回の抽出の分析』『💡 次の一杯への具体的な提案』。冒頭の挨拶文は不要です。提案パートでは、ユーザーが次回すぐ試せる具体的な数値（例：湯温±1℃、時間±5〜10秒、挽き目1段階）を必ず1つ以上含めてください。JSON形式（例：{\"advice\":\"...\"}）、キー名、コードブロック、機械的なフォーマットは絶対に出力しないでください。"
+        : "You are a dedicated professional barista coach. Analyze the provided brew records and give practical actions for the next cup. Output must be plain natural-language text (Markdown allowed), start on the first line with these exact headings in order: '☕️ Brew Analysis' then '💡 Concrete Next-Brew Actions'. Do not include greetings. In the action section, always include at least one immediately testable numeric adjustment (for example: water temperature ±1°C, brew time ±5-10s, or one grind step). Never output JSON, object keys, or code blocks.";
 
     const userPrompt = JSON.stringify({ context, entries }, null, 2);
 
@@ -89,7 +89,7 @@ export async function POST(req: Request) {
           model: google(modelName),
           system: systemPrompt,
           temperature: 0.4,
-          maxOutputTokens: 240,
+          maxOutputTokens: 420,
           prompt: promptText,
         });
 
