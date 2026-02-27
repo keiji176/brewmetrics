@@ -89,7 +89,7 @@ export async function POST(req: Request) {
           model: google(modelName),
           system: systemPrompt,
           temperature: 0.4,
-          maxTokens: 240,
+          maxOutputTokens: 240,
           prompt: promptText,
         });
         advice = text.trim();
