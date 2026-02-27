@@ -1,4 +1,5 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { google } from "@ai-sdk/google";
+import { generateText } from "ai";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -31,10 +32,10 @@ function normalizeEntry(entry: CoachEntry) {
 }
 
 export async function POST(req: Request) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
-      { error: "ANTHROPIC_API_KEY is not set on server." },
+      { error: "GOOGLE_GENERATIVE_AI_API_KEY is not set on server." },
       { status: 500 }
     );
   }
@@ -57,8 +58,6 @@ export async function POST(req: Request) {
       );
     }
 
-    const anthropic = new Anthropic({ apiKey });
-
     const systemPrompt =
       locale === "ja"
         ? "あなたはプロのバリスタ兼抽出コーチです。必ず安全で実践的な提案を日本語で返してください。出力は2〜4文、簡潔に。具体的に次回試す調整値を1つ以上入れてください。"
@@ -66,48 +65,43 @@ export async function POST(req: Request) {
 
     const userPrompt = JSON.stringify({ context, entries }, null, 2);
 
-    const requestPayload = {
-      max_tokens: 240,
-      temperature: 0.4,
-      system: systemPrompt,
-      messages: [
-        {
-          role: "user" as const,
-          content:
-            (locale === "ja"
-              ? "以下の記録データを分析し、次回もっと美味しくするための具体的アドバイスをください。"
-              : "Analyze the following records and give concrete suggestions for the next better cup.") +
-            "\n\n" +
-            userPrompt,
-        },
-      ],
-    };
+    const promptText =
+      (locale === "ja"
+        ? "以下の記録データを分析し、次回もっと美味しくするための具体的アドバイスをください。"
+        : "Analyze the following records and give concrete suggestions for the next better cup.") +
+      "\n\n" +
+      userPrompt;
 
-    let response;
-    try {
-      response = await anthropic.messages.create({
-        model: "claude-3-5-sonnet-20240620",
-        ...requestPayload,
-      });
-    } catch (modelError) {
-      const message = modelError instanceof Error ? modelError.message : String(modelError);
-      const isModelNotFound =
-        message.includes("not_found_error") && message.includes("model:");
+    const candidateModels = [
+      "gemini-2.5-flash",
+      "gemini-1.5-flash",
+      "gemini-1.5-flash-latest",
+      "gemini-2.0-flash-lite",
+      "gemini-2.0-flash",
+    ] as const;
 
-      if (!isModelNotFound) {
-        throw modelError;
+    let advice = "";
+    let lastError: unknown = null;
+
+    for (const modelName of candidateModels) {
+      try {
+        const { text } = await generateText({
+          model: google(modelName),
+          system: systemPrompt,
+          temperature: 0.4,
+          maxTokens: 240,
+          prompt: promptText,
+        });
+        advice = text.trim();
+        if (advice) break;
+      } catch (error) {
+        lastError = error;
       }
-
-      response = await anthropic.messages.create({
-        model: "claude-3-haiku-20240307",
-        ...requestPayload,
-      });
     }
 
-    const advice = response.content
-      .map((block) => (block.type === "text" ? block.text : ""))
-      .join("\n")
-      .trim();
+    if (!advice && lastError) {
+      throw lastError;
+    }
 
     if (!advice) {
       return NextResponse.json(
