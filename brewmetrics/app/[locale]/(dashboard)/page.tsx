@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { RoastingRecordRow } from "@/lib/supabase/types";
 import { KpiCards } from "@/components/dashboard/KpiCards";
 import { QualityRadarChart } from "@/components/dashboard/QualityRadarChart";
 import { QualityTrendChart } from "@/components/dashboard/QualityTrendChart";
@@ -15,8 +14,21 @@ import { useTranslations } from "next-intl";
 
 const DASHBOARD_WELCOME_DISMISSED_KEY = "brewmetrics.dashboard.welcomeDismissed";
 
+type DashboardBrewRecord = {
+  id: string;
+  bean_name: string | null;
+  roaster: string | null;
+  grind_size: string | null;
+  temperature: number | null;
+  brew_time: number | null;
+  score: number | null;
+  notes: string | null;
+  created_at: string;
+};
+
 function useRoastingRecords() {
-  const [records, setRecords] = useState<RoastingRecordRow[]>([]);
+  const [records, setRecords] = useState<DashboardBrewRecord[]>([]);
+  const [beanCount, setBeanCount] = useState(0);
   const [hasBeans, setHasBeans] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,31 +40,55 @@ function useRoastingRecords() {
       setLoading(false);
       return;
     }
-    Promise.all([
-      supabase
-        .from("roasting_records")
-        .select("*")
-        .order("created_at", { ascending: true }),
-      supabase.from("bean_profiles").select("id").limit(1),
-    ]).then(([roastingRes, beanRes]) => {
-      setLoading(false);
+    (async () => {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-      if (roastingRes.error) {
-        setError(roastingRes.error.message);
+      if (userError || !user) {
+        setError(userError?.message ?? "User session not found.");
+        setLoading(false);
         return;
       }
 
-      setRecords((roastingRes.data as RoastingRecordRow[]) ?? []);
-      setHasBeans((beanRes.data?.length ?? 0) > 0);
-    });
+      const [brewRes, beanRes] = await Promise.all([
+        supabase
+          .from("brew_records")
+          .select("id, bean_name, roaster, grind_size, temperature, brew_time, score, notes, created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: true }),
+        supabase
+          .from("bean_profiles")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id),
+      ]);
+
+      setLoading(false);
+
+      if (brewRes.error) {
+        setError(brewRes.error.message);
+        return;
+      }
+
+      if (beanRes.error) {
+        setError(beanRes.error.message);
+        return;
+      }
+
+      setRecords((brewRes.data as DashboardBrewRecord[]) ?? []);
+      const nextBeanCount = beanRes.count ?? 0;
+      setBeanCount(nextBeanCount);
+      setHasBeans(nextBeanCount > 0);
+    })();
   }, [supabase]);
 
-  return { records, hasBeans, loading, error };
+  return { records, beanCount, hasBeans, loading, error };
 }
 
 export default function DashboardPage() {
   const t = useTranslations("dashboard");
-  const { records, hasBeans, loading, error } = useRoastingRecords();
+  const { records, beanCount, hasBeans, loading, error } = useRoastingRecords();
   const [welcomeDismissed, setWelcomeDismissed] = useState(false);
 
   useEffect(() => {
@@ -68,19 +104,19 @@ export default function DashboardPage() {
   }
 
   const totalRecords = records.length;
-  const scores = records.map((r) => r.cupping_score).filter((s): s is number => s != null);
+  const scores = records.map((r) => r.score).filter((s): s is number => s != null);
   const avgCupping = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
 
   const trendData = (() => {
     const byDate: Record<string, number[]> = {};
     records.forEach((r) => {
-      if (r.cupping_score == null) return;
+      if (r.score == null) return;
       const d = new Date(r.created_at).toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
       });
       if (!byDate[d]) byDate[d] = [];
-      byDate[d].push(r.cupping_score);
+      byDate[d].push(r.score);
     });
     return Object.entries(byDate)
       .map(([date, vals]) => ({
@@ -92,13 +128,13 @@ export default function DashboardPage() {
 
   const scatterData = records
     .filter(
-      (r): r is RoastingRecordRow & { roast_temperature: number; cupping_score: number } =>
-        r.roast_temperature != null && r.cupping_score != null
+      (r): r is DashboardBrewRecord & { temperature: number; score: number } =>
+        r.temperature != null && r.score != null
     )
     .map((r) => ({
-      roast_temperature: r.roast_temperature,
-      cupping_score: r.cupping_score,
-      name: r.bean_name ?? undefined,
+      roast_temperature: r.temperature,
+      cupping_score: r.score,
+      name: r.bean_name ?? r.roaster ?? undefined,
     }));
 
   const recentTrend: "up" | "down" | "neutral" =
@@ -206,11 +242,12 @@ export default function DashboardPage() {
       <section className="space-y-8 pt-8">
         <KpiCards
           totalRecords={totalRecords}
+          totalBeans={beanCount}
           avgCupping={avgCupping}
           recentTrend={recentTrend}
         />
 
-        <AICoachPanel context="roast" entries={records} />
+        <AICoachPanel context="brew" entries={records} />
 
         <div className="grid gap-6 lg:grid-cols-2">
           <QualityRadarChart data={radarData} />

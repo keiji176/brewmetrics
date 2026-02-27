@@ -184,7 +184,7 @@
     "selectionDeleteConfirm": "{count}件のアイテムを削除しますか？",
     "selectionItemAria": "この項目を選択",
     "noSearchResults": "条件に一致する抽出記録が見つかりませんでした。",
-    "statsTotalBrews": "抽出回数",
+    "statsTotalBrews": "これまでに淹れた杯数",
     "statsAvgScore": "平均スコア",
     "statsFavoriteBean": "お気に入りの豆",
     "statsNoFavoriteBean": "データなし",

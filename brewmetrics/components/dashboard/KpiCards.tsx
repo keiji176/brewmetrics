@@ -6,11 +6,12 @@ import { Coffee, Star, Hash, BarChart3 } from "lucide-react";
 
 interface KpiCardsProps {
   totalRecords: number;
+  totalBeans: number;
   avgCupping: number | null;
   recentTrend: "up" | "down" | "neutral";
 }
 
-export function KpiCards({ totalRecords, avgCupping, recentTrend }: KpiCardsProps) {
+export function KpiCards({ totalRecords, totalBeans, avgCupping, recentTrend }: KpiCardsProps) {
   const t = useTranslations("dashboard");
   const trendLabel =
     recentTrend === "up" ? t("improving") : recentTrend === "down" ? t("declining") : t("stable");
@@ -27,7 +28,7 @@ export function KpiCards({ totalRecords, avgCupping, recentTrend }: KpiCardsProp
       sub: t("averageCuppingScoreSub"),
       icon: Star,
     },
-    { title: t("batchesTracked"), value: String(totalRecords), sub: t("batchesTrackedSub"), icon: Coffee },
+    { title: t("batchesTracked"), value: String(totalBeans), sub: t("batchesTrackedSub"), icon: Coffee },
     { title: t("qualityTrend"), value: trendLabel, sub: t("trendSub"), icon: BarChart3 },
   ];
 
